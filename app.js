@@ -1,11 +1,4 @@
 // ===== DATA STORE =====
-// One-time cleanup: clears out any leftover/stale cart data from earlier
-// preview/testing sessions so every visitor genuinely starts with an
-// empty cart on this version, instead of inheriting old localStorage state.
-if (!localStorage.getItem("rky_cart_reset_v3")) {
-  localStorage.removeItem("rky_cart");
-  localStorage.setItem("rky_cart_reset_v3", "1");
-}
 let products = JSON.parse(localStorage.getItem("rky_products")) || getDefaultProducts();
 migrateNewDefaultProducts();
 let cart = JSON.parse(localStorage.getItem("rky_cart")) || [];
@@ -111,15 +104,6 @@ function renderStars(rating) {
   return s;
 }
 
-function renderStarsSvg(rating) {
-  let out = "";
-  for (let i = 1; i <= 5; i++) {
-    const fill = rating >= i ? 1 : rating >= i - 0.5 ? 0.5 : 0;
-    out += `<span class="star-cell"><svg viewBox="0 0 20 20" width="12" height="12"><path fill="var(--border)" d="M10 1.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L1.3 7.8l6.1-.7z"/><path fill="var(--gold)" style="clip-path:inset(0 ${100 - fill * 100}% 0 0)" d="M10 1.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L1.3 7.8l6.1-.7z"/></svg></span>`;
-  }
-  return out;
-}
-
 // ===== TOAST NOTIFICATION =====
 function showToast(msg, emoji = "✅") {
   const t = document.getElementById("toast");
@@ -141,6 +125,20 @@ function syncDrawerDarkMode(isDark) {
   const label = document.getElementById("drawerDarkLabel");
   if (icon) icon.textContent = isDark ? "☀️" : "🌙";
   if (label) label.textContent = isDark ? "Mode Terang" : "Mode Gelap";
+}
+
+function closeDemoNotice() {
+  const el = document.getElementById("demoNotice");
+  if (el) {
+    el.classList.add("notice-hide");
+    setTimeout(() => { el.style.display = "none"; }, 400);
+  }
+}
+function initDemoNotice() {
+  // Selalu tampil setiap kali halaman dibuka/di-reload — tombol ✕ hanya
+  // menyembunyikan untuk tampilan saat ini, tidak disimpan permanen.
+  const el = document.getElementById("demoNotice");
+  if (el) { el.classList.remove("notice-hide"); el.style.display = ""; }
 }
 
 function initDarkMode() {
@@ -203,9 +201,8 @@ function renderCard(p, idx) {
           <span class="price-current">${formatRp(p.price)}</span>
           ${p.origPrice ? `<span class="price-original">${formatRp(p.origPrice)}</span>` : ""}
         </div>
-        ${disc > 0 ? `<div class="card-savings">Hemat ${formatRp(p.origPrice - p.price)}</div>` : ""}
         <div class="card-meta">
-          <span class="card-rating">${renderStarsSvg(p.rating)}<b>${p.rating}</b></span>
+          <span class="card-rating">${renderStars(p.rating)} ${p.rating}</span>
           <span class="card-sold">${(p.sold || 0).toLocaleString("id-ID")} terjual</span>
         </div>
         <div class="card-stock ${isLowStock ? "low" : ""}">
@@ -328,18 +325,6 @@ function addToCart(e, id) {
   saveCart();
   updateCartBadge();
   showToast(`${p.name} ditambahkan ke keranjang!`, "🛒");
-  bounceAddButton(e.currentTarget);
-}
-
-function bounceAddButton(btn) {
-  if (!btn) return;
-  const original = btn.innerHTML;
-  btn.classList.add("just-added");
-  btn.innerHTML = "✓ Ditambahkan";
-  setTimeout(() => {
-    btn.classList.remove("just-added");
-    btn.innerHTML = original;
-  }, 1100);
 }
 
 function updateCartBadge() {
@@ -1330,7 +1315,7 @@ function updateCountdown() {
   const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
   const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
   const el = document.getElementById("countdown");
-  if (el) el.innerHTML = `<span class="cd-unit">${h}</span><span class="cd-sep">:</span><span class="cd-unit">${m}</span><span class="cd-sep">:</span><span class="cd-unit">${s}</span>`;
+  if (el) el.textContent = `${h}:${m}:${s}`;
 }
 
 // ===== AI CHATBOT =====
@@ -1704,6 +1689,7 @@ function saveProfileAddress() {
 // ===== INIT =====
 window.addEventListener("DOMContentLoaded", () => {
   initDarkMode();
+  initDemoNotice();
   renderShop();
   updateCartBadge();
   updateWishBadge();
@@ -1726,63 +1712,59 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // ===== PAGE LOADER =====
 (function () {
-  // Tampilkan intro singkat hanya di kunjungan PERTAMA tiap sesi browser.
-  // Reload/navigasi berikutnya dalam sesi yang sama akan hampir instan.
+  // Tampilkan intro 10 detik penuh hanya di kunjungan PERTAMA tiap sesi browser.
+  // Reload/navigasi berikutnya dalam sesi yang sama akan lebih cepat (UX lebih baik).
   const seenThisSession = sessionStorage.getItem("rky_loader_seen") === "1";
-  const MIN_DISPLAY_MS = seenThisSession ? 350 : 1600;
-  const FALLBACK_MS = MIN_DISPLAY_MS + 2500; // jaring pengaman jika 'load' tidak pernah terpicu (mis. font/CDN diblokir)
+  const MIN_DISPLAY_MS = seenThisSession ? 600 : 2800;
+  const FALLBACK_MS = seenThisSession ? 2200 : 5000;
   const shownAt = Date.now();
   let hidden = false;
-  let loadFired = false;
 
   const percentEl = document.getElementById("loaderPercent");
   const textEl = document.getElementById("loaderText");
   const tips = [
     "Menyiapkan pengalaman belanja terbaikmu...",
     "Mengecek stok produk favorit...",
+    "Menghitung diskon flash sale...",
+    "Menyusun rekomendasi untukmu...",
+    "Menyiapkan estimasi ongkir kurir...",
     "Hampir siap, sebentar lagi! ✨",
   ];
   let tipIndex = 0;
   let tipTimer = null;
   let percentTimer = null;
 
-  if (percentEl && textEl && MIN_DISPLAY_MS > 800) {
+  if (percentEl && textEl) {
     tipTimer = setInterval(() => {
       tipIndex = (tipIndex + 1) % tips.length;
       textEl.style.opacity = 0;
-      setTimeout(() => { textEl.textContent = tips[tipIndex]; textEl.style.opacity = 1; }, 200);
-    }, Math.max(700, MIN_DISPLAY_MS / tips.length));
-  }
+      setTimeout(() => { textEl.textContent = tips[tipIndex]; textEl.style.opacity = 1; }, 250);
+    }, Math.max(1200, MIN_DISPLAY_MS / tips.length));
 
-  // Progress bar bergerak mulus dan HANYA menyentuh 100% tepat saat loader
-  // benar-benar akan hilang — tidak pernah "membeku" di 100%.
-  function tick() {
-    if (hidden) return;
-    const elapsed = Date.now() - shownAt;
-    const readyToHide = loadFired && elapsed >= MIN_DISPLAY_MS;
-    if (percentEl) {
-      const pct = readyToHide ? 100 : Math.min(97, Math.round((elapsed / MIN_DISPLAY_MS) * 100));
+    percentTimer = setInterval(() => {
+      const elapsed = Date.now() - shownAt;
+      const pct = Math.min(99, Math.round((elapsed / MIN_DISPLAY_MS) * 100));
       percentEl.textContent = pct + "%";
-    }
-    if (readyToHide) { doHide(); return; }
-    percentTimer = requestAnimationFrame(tick);
+    }, 80);
   }
-  percentTimer = requestAnimationFrame(tick);
 
-  function doHide() {
+  function hideLoader() {
     if (hidden) return;
     hidden = true;
     if (tipTimer) clearInterval(tipTimer);
-    if (percentTimer) cancelAnimationFrame(percentTimer);
+    if (percentTimer) clearInterval(percentTimer);
+    if (percentEl) percentEl.textContent = "100%";
     const loader = document.getElementById("pageLoader");
     if (!loader) return;
-    loader.classList.add("loader-hide");
-    setTimeout(() => loader.remove(), 450);
-    sessionStorage.setItem("rky_loader_seen", "1");
+    const elapsed = Date.now() - shownAt;
+    const wait = Math.max(0, MIN_DISPLAY_MS - elapsed);
+    setTimeout(() => {
+      loader.classList.add("loader-hide");
+      setTimeout(() => loader.remove(), 550);
+      sessionStorage.setItem("rky_loader_seen", "1");
+    }, wait);
   }
 
-  function onLoadSignal() { loadFired = true; }
-
-  window.addEventListener("load", onLoadSignal);
-  setTimeout(onLoadSignal, FALLBACK_MS); // pastikan loader tidak pernah tersangkut selamanya
+  window.addEventListener("load", hideLoader);
+  setTimeout(hideLoader, FALLBACK_MS);
 })();
