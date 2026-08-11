@@ -1,5 +1,6 @@
 // ===== DATA STORE =====
 let products = JSON.parse(localStorage.getItem("rky_products")) || getDefaultProducts();
+migrateNewDefaultProducts();
 let cart = JSON.parse(localStorage.getItem("rky_cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("rky_wishlist")) || [];
 let orders = JSON.parse(localStorage.getItem("rky_orders")) || [];
@@ -27,12 +28,51 @@ function getDefaultProducts() {
     { id: base+6, name: "Sepatu Futsal Specs Accelerator", category: "olahraga", price: 380000, origPrice: 450000, image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=400&fit=crop", stock: 40, rating: 4.6, sold: 320, desc: "Sepatu futsal Specs dengan sol anti-slip khusus indoor, upper TPU yang tahan lama.", flash: false, createdAt: base },
     { id: base+7, name: "Kursi Gaming RGB Ergonomis", category: "rumah", price: 1800000, origPrice: 2500000, image: "https://images.unsplash.com/photo-1541558869434-2840d308329a?w=400&h=400&fit=crop", stock: 12, rating: 4.5, sold: 67, desc: "Kursi gaming dengan sandaran lumbar adjustable, sandaran tangan 4D, dan lampu RGB.", flash: false, createdAt: base },
     { id: base+8, name: "Laptop ASUS ROG Strix G16", category: "elektronik", price: 24500000, origPrice: 28000000, image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=400&h=400&fit=crop", stock: 5, rating: 4.9, sold: 45, desc: "Laptop gaming ASUS ROG dengan Intel Core i9 Gen 13, RTX 4080, RAM 32GB, 165Hz QHD.", flash: true, createdAt: base },
+
+    { id: base+9, name: "Sony Kamera Mirrorless Alpha", category: "elektronik", price: 18500000, origPrice: 21000000, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop", stock: 10, rating: 4.8, sold: 89, desc: "Kamera mirrorless full-frame dengan sensor 33MP, video 4K 60fps, dan autofocus real-time tracking.", flash: false, createdAt: base },
+    { id: base+10, name: "Smartwatch Series Fitness Pro", category: "elektronik", price: 3200000, origPrice: 3800000, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop", stock: 35, rating: 4.6, sold: 267, desc: "Jam tangan pintar dengan pelacak detak jantung, GPS, tahan air 50m, dan baterai tahan 7 hari.", flash: false, createdAt: base },
+    { id: base+11, name: "Smart TV LED 55 Inch 4K", category: "elektronik", price: 6800000, origPrice: 8500000, image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=400&fit=crop", stock: 8, rating: 4.7, sold: 54, desc: "Smart TV layar 4K UHD 55 inci dengan Android TV, HDR10+, dan speaker Dolby Audio.", flash: true, createdAt: base },
+
+    { id: base+12, name: "Tas Ransel Kulit Premium", category: "fashion", price: 650000, origPrice: 900000, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop", stock: 22, rating: 4.7, sold: 198, desc: "Tas ransel kulit sintetis premium, muat laptop 15 inci, cocok untuk kerja & traveling.", flash: false, createdAt: base },
+    { id: base+13, name: "Kacamata Hitam Fashion UV400", category: "fashion", price: 285000, origPrice: 400000, image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop", stock: 50, rating: 4.5, sold: 312, desc: "Kacamata hitam dengan lensa polarized anti-UV, frame ringan dan stylish.", flash: false, createdAt: base },
+
+    { id: base+14, name: "Nasi Goreng Spesial Seafood", category: "makanan", price: 38000, origPrice: null, image: "https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=400&h=400&fit=crop", stock: 80, rating: 4.8, sold: 645, desc: "Nasi goreng spesial dengan campuran udang, cumi, dan bakso ikan, disajikan dengan telur mata sapi.", flash: false, createdAt: base },
+    { id: base+15, name: "Kopi Susu Gula Aren Kekinian", category: "makanan", price: 18000, origPrice: 22000, image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop", stock: 150, rating: 4.9, sold: 2103, desc: "Kopi susu dengan gula aren asli, dibuat dari biji kopi robusta pilihan tanpa bahan pengawet.", flash: true, createdAt: base },
+    { id: base+16, name: "Kue Ulang Tahun Custom", category: "makanan", price: 220000, origPrice: 275000, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=400&fit=crop", stock: 15, rating: 4.9, sold: 156, desc: "Kue ulang tahun custom dengan topping buah segar, bisa request tulisan & warna sesuai keinginan.", flash: false, createdAt: base },
+
+    { id: base+17, name: "Parfum Mewah Eau de Parfum 100ml", category: "kecantikan", price: 485000, origPrice: 650000, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop", stock: 28, rating: 4.7, sold: 342, desc: "Parfum tahan lama dengan aroma floral-woody, cocok dipakai harian maupun acara spesial.", flash: true, createdAt: base },
+
+    { id: base+18, name: "Sepeda Gunung MTB 26 Inch", category: "olahraga", price: 2450000, origPrice: 3000000, image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400&h=400&fit=crop", stock: 9, rating: 4.6, sold: 78, desc: "Sepeda gunung dengan rangka aluminium ringan, 21 speed shimano, rem cakram depan-belakang.", flash: false, createdAt: base },
+
+    { id: base+19, name: "Air Fryer Digital 5L", category: "rumah", price: 550000, origPrice: 750000, image: "https://images.unsplash.com/photo-1648146029733-7a6a0846bd68?w=400&h=400&fit=crop", stock: 20, rating: 4.8, sold: 289, desc: "Air fryer kapasitas 5 liter, tanpa minyak, dengan 8 mode masak otomatis dan layar digital.", flash: true, createdAt: base },
+
+    { id: base+20, name: "Anak Kucing Anggora Lucu", category: "hewan", price: 1500000, origPrice: null, image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=400&fit=crop", stock: 3, rating: 5.0, sold: 12, desc: "Anak kucing anggora sehat, sudah vaksin & obat cacing, usia 2 bulan, litter box trained.", flash: false, createdAt: base },
+    { id: base+21, name: "Anak Anjing Golden Retriever", category: "hewan", price: 3500000, origPrice: 4000000, image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=400&fit=crop", stock: 2, rating: 5.0, sold: 8, desc: "Puppy golden retriever ras murni, sudah vaksin lengkap, sehat & aktif, siap kirim luar kota.", flash: true, createdAt: base },
+    { id: base+22, name: "Makanan Kucing Premium 1.5kg", category: "hewan", price: 145000, origPrice: 175000, image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=400&h=400&fit=crop", stock: 60, rating: 4.7, sold: 421, desc: "Dry food kucing dengan kandungan protein tinggi, membantu bulu lebih sehat & mengkilap.", flash: false, createdAt: base },
+
+    { id: base+23, name: "Motor Yamaha NMAX 155 Connected", category: "otomotif", price: 34500000, origPrice: 37000000, image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400&h=400&fit=crop", stock: 4, rating: 4.8, sold: 23, desc: "Motor matic premium Yamaha NMAX 155 Connected/ABS, unit baru, garansi resmi 3 tahun.", flash: true, createdAt: base },
+    { id: base+24, name: "Toyota Avanza 1.5G Bekas 2021", category: "otomotif", price: 189000000, origPrice: 210000000, image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=400&fit=crop", stock: 1, rating: 4.7, sold: 3, desc: "Mobil bekas Toyota Avanza 1.5G tahun 2021, tangan pertama, servis record lengkap, pajak hidup.", flash: false, createdAt: base },
+    { id: base+25, name: "Motor Honda Beat Street 2024", category: "otomotif", price: 19800000, origPrice: 21500000, image: "https://images.unsplash.com/photo-1622185135505-2d795003994a?w=400&h=400&fit=crop", stock: 6, rating: 4.6, sold: 41, desc: "Motor matic irit Honda Beat Street, unit baru on the road, cocok untuk harian & kerja.", flash: false, createdAt: base },
   ];
 }
 
 // ===== SAVE FUNCTIONS =====
 function saveProducts() { localStorage.setItem("rky_products", JSON.stringify(products)); }
-function saveCart() { localStorage.setItem("rky_cart", JSON.stringify(cart)); }
+
+// Tambahkan produk dummy baru ke katalog yang sudah tersimpan di browser,
+// tanpa menghapus produk yang sudah pernah ditambah/diedit oleh admin.
+function migrateNewDefaultProducts() {
+  const CURRENT_VERSION = 2;
+  const savedVersion = parseInt(localStorage.getItem("rky_products_version") || "1");
+  if (savedVersion >= CURRENT_VERSION) return;
+  const existingNames = new Set(products.map(p => p.name));
+  const freshDefaults = getDefaultProducts();
+  freshDefaults.forEach(p => {
+    if (!existingNames.has(p.name)) products.push(p);
+  });
+  localStorage.setItem("rky_products", JSON.stringify(products));
+  localStorage.setItem("rky_products_version", String(CURRENT_VERSION));
+}function saveCart() { localStorage.setItem("rky_cart", JSON.stringify(cart)); }
 function saveWishlist() { localStorage.setItem("rky_wishlist", JSON.stringify(wishlist)); }
 function saveOrders() { localStorage.setItem("rky_orders", JSON.stringify(orders)); }
 function saveNotifications() { localStorage.setItem("rky_notifs", JSON.stringify(adminNotifications)); }
@@ -77,6 +117,14 @@ function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   document.getElementById("darkModeBtn").textContent = isDark ? "☀️" : "🌙";
   localStorage.setItem("rky_dark", isDark ? "1" : "0");
+  syncDrawerDarkMode(isDark);
+}
+
+function syncDrawerDarkMode(isDark) {
+  const icon = document.getElementById("drawerDarkIcon");
+  const label = document.getElementById("drawerDarkLabel");
+  if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+  if (label) label.textContent = isDark ? "Mode Terang" : "Mode Gelap";
 }
 
 function initDarkMode() {
@@ -85,6 +133,7 @@ function initDarkMode() {
     document.body.classList.add("dark");
     document.getElementById("darkModeBtn").textContent = "☀️";
   }
+  syncDrawerDarkMode(saved === "1");
 }
 
 // ===== HERO SLIDER =====
@@ -195,7 +244,30 @@ function filterCategory(cat, btn) {
   renderShop();
 }
 
-function sortProducts(val) { currentSort = val; renderShop(); }
+function sortProducts(val, el) {
+  currentSort = val;
+  renderShop();
+  document.querySelectorAll(".sort-option").forEach(o => o.classList.remove("active"));
+  if (el) {
+    el.classList.add("active");
+    document.getElementById("sortTriggerLabel").textContent = val === "default" ? "Urutkan" : el.textContent.trim();
+  }
+  closeSortMenu();
+}
+
+function toggleSortMenu(e) {
+  if (e) e.stopPropagation();
+  const ctrl = document.getElementById("sortControl");
+  ctrl.classList.toggle("open");
+}
+function closeSortMenu() {
+  const ctrl = document.getElementById("sortControl");
+  if (ctrl) ctrl.classList.remove("open");
+}
+document.addEventListener("click", (e) => {
+  const ctrl = document.getElementById("sortControl");
+  if (ctrl && !ctrl.contains(e.target)) closeSortMenu();
+});
 function handleSearch() { renderShop(); }
 
 // ===== WISHLIST =====
@@ -212,6 +284,8 @@ function toggleWishlist(e, id) {
 
 function updateWishBadge() {
   document.getElementById("wishBadge").textContent = wishlist.length;
+  const b = document.getElementById("wishBadgeBottom");
+  if (b) b.textContent = wishlist.length;
 }
 
 function renderWishlist() {
@@ -242,6 +316,8 @@ function addToCart(e, id) {
 function updateCartBadge() {
   const total = cart.reduce((sum, c) => sum + c.qty, 0);
   document.getElementById("cartBadge").textContent = total;
+  const b = document.getElementById("cartBadgeBottom");
+  if (b) b.textContent = total;
 }
 
 function openCart() {
@@ -1188,6 +1264,31 @@ function showPage(page) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (page === "wishlist") renderWishlist();
   if (page === "admin" && !isAdmin) { handleAdminClick(); return; }
+  document.querySelectorAll(".bn-item[data-bn]").forEach(el => {
+    el.classList.toggle("active", el.dataset.bn === page);
+  });
+}
+
+// ===== MOBILE DRAWER =====
+function openMobileDrawer() {
+  document.getElementById("mobileDrawer").classList.add("open");
+  document.getElementById("mobileDrawerOverlay").classList.add("open");
+}
+function closeMobileDrawer() {
+  document.getElementById("mobileDrawer").classList.remove("open");
+  document.getElementById("mobileDrawerOverlay").classList.remove("open");
+}
+
+// ===== BOTTOM NAV HELPERS =====
+function bnGoHome() {
+  showPage("shop");
+}
+function bnGoCategories() {
+  showPage("shop");
+  setTimeout(() => {
+    const el = document.getElementById("categoryNav");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 350);
 }
 
 // ===== COUNTDOWN TIMER =====
@@ -1507,15 +1608,21 @@ function updateAccountUI() {
   const icon = document.getElementById("accountBtnIcon");
   const label = document.getElementById("accountBtnLabel");
   const btn = document.getElementById("accountBtn");
+  const bnIcon = document.getElementById("bnAccountIcon");
+  const bnLabel = document.getElementById("bnAccountLabel");
   if (!icon || !label) return;
   if (user) {
     icon.innerHTML = `<span class="account-avatar-chip">${avatarHtml(user, 24)}<span class="account-status-dot"></span></span>`;
     label.textContent = user.name.split(" ")[0];
     if (btn) btn.classList.add("logged-in");
+    if (bnIcon) bnIcon.innerHTML = `<span class="account-avatar-chip">${avatarHtml(user, 22)}<span class="account-status-dot"></span></span>`;
+    if (bnLabel) bnLabel.textContent = user.name.split(" ")[0];
   } else {
     icon.textContent = "👤";
     label.textContent = "Akun";
     if (btn) btn.classList.remove("logged-in");
+    if (bnIcon) bnIcon.textContent = "👤";
+    if (bnLabel) bnLabel.textContent = "Akun";
   }
 }
 
@@ -1587,3 +1694,62 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   setTimeout(() => { const badge = document.getElementById("chatFabBadge"); if (badge) badge.style.display = "flex"; }, 3000);
 });
+
+// ===== PAGE LOADER =====
+(function () {
+  // Tampilkan intro 10 detik penuh hanya di kunjungan PERTAMA tiap sesi browser.
+  // Reload/navigasi berikutnya dalam sesi yang sama akan lebih cepat (UX lebih baik).
+  const seenThisSession = sessionStorage.getItem("rky_loader_seen") === "1";
+  const MIN_DISPLAY_MS = seenThisSession ? 700 : 10000;
+  const FALLBACK_MS = seenThisSession ? 2500 : 12000;
+  const shownAt = Date.now();
+  let hidden = false;
+
+  const percentEl = document.getElementById("loaderPercent");
+  const textEl = document.getElementById("loaderText");
+  const tips = [
+    "Menyiapkan pengalaman belanja terbaikmu...",
+    "Mengecek stok produk favorit...",
+    "Menghitung diskon flash sale...",
+    "Menyusun rekomendasi untukmu...",
+    "Menyiapkan estimasi ongkir kurir...",
+    "Hampir siap, sebentar lagi! ✨",
+  ];
+  let tipIndex = 0;
+  let tipTimer = null;
+  let percentTimer = null;
+
+  if (percentEl && textEl) {
+    tipTimer = setInterval(() => {
+      tipIndex = (tipIndex + 1) % tips.length;
+      textEl.style.opacity = 0;
+      setTimeout(() => { textEl.textContent = tips[tipIndex]; textEl.style.opacity = 1; }, 250);
+    }, Math.max(1200, MIN_DISPLAY_MS / tips.length));
+
+    percentTimer = setInterval(() => {
+      const elapsed = Date.now() - shownAt;
+      const pct = Math.min(99, Math.round((elapsed / MIN_DISPLAY_MS) * 100));
+      percentEl.textContent = pct + "%";
+    }, 80);
+  }
+
+  function hideLoader() {
+    if (hidden) return;
+    hidden = true;
+    if (tipTimer) clearInterval(tipTimer);
+    if (percentTimer) clearInterval(percentTimer);
+    if (percentEl) percentEl.textContent = "100%";
+    const loader = document.getElementById("pageLoader");
+    if (!loader) return;
+    const elapsed = Date.now() - shownAt;
+    const wait = Math.max(0, MIN_DISPLAY_MS - elapsed);
+    setTimeout(() => {
+      loader.classList.add("loader-hide");
+      setTimeout(() => loader.remove(), 550);
+      sessionStorage.setItem("rky_loader_seen", "1");
+    }, wait);
+  }
+
+  window.addEventListener("load", hideLoader);
+  setTimeout(hideLoader, FALLBACK_MS);
+})();

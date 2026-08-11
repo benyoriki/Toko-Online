@@ -7,6 +7,8 @@
 <meta property="og:url" content="https://onlintoko.netlify.app/">
 <meta property="og:title" content="@benyoriki Store - Belanja Online Praktis & Modern">
 <meta property="og:description" content="Platform e-commerce modern untuk kebutuhan harian Anda.">
+<meta property="og:image" content="preview.jpg">
+<meta name="theme-color" content="#141221">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>@benyoriki Store — Belanja Mudah, Harga Terbaik</title>
@@ -17,6 +19,29 @@
 <link rel="icon" href="favicon.png">
 </head>
 <body>
+
+<!-- ===== PAGE LOADER ===== -->
+<div id="pageLoader" class="page-loader">
+  <div class="loader-content">
+    <div class="loader-cart">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21 8H6" stroke="url(#lc-grad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="9" cy="21" r="1.4" fill="#FF4D2E"/>
+        <circle cx="18" cy="21" r="1.4" fill="#FF4D2E"/>
+        <defs>
+          <linearGradient id="lc-grad" x1="2" y1="3" x2="21" y2="16" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FF4D2E"/>
+            <stop offset="1" stop-color="#F5B400"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="loader-brand">@benyoriki<span>Store</span></div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+    <div class="loader-percent" id="loaderPercent">0%</div>
+    <div class="loader-text" id="loaderText">Menyiapkan pengalaman belanja terbaikmu...</div>
+  </div>
+</div>
 
 <!-- TOAST NOTIFICATION -->
 <div id="toast" class="toast"></div>
@@ -206,6 +231,135 @@
   </div>
 </div>
 
+<!-- ===== AUTH MODAL (Masuk / Daftar Akun) ===== -->
+<div id="authModal" class="modal-overlay" onclick="closeAuthModal(event)">
+  <div class="modal-box auth-box">
+    <button onclick="closeAuthModal()" class="modal-close">✕</button>
+
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" id="authTabLoginBtn" onclick="switchAuthTab('login')">Masuk</button>
+      <button class="auth-tab-btn" id="authTabRegisterBtn" onclick="switchAuthTab('register')">Daftar Akun</button>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div id="authPanelLogin" class="auth-panel active">
+      <div class="login-header">
+        <div class="login-icon">👋</div>
+        <h2>Selamat Datang Kembali</h2>
+        <p>Masuk untuk lanjut belanja & pantau pesananmu</p>
+      </div>
+      <div class="login-form">
+        <div class="input-group">
+          <label>Email atau Nomor HP</label>
+          <input type="text" id="authLoginId" placeholder="email@kamu.com / 08xxxxxxxxxx" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="authLoginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doUserLogin()" />
+        </div>
+        <button onclick="doUserLogin()" class="btn-login">Masuk</button>
+      </div>
+      <p class="auth-switch-text">Belum punya akun? <a onclick="switchAuthTab('register')">Daftar sekarang</a></p>
+    </div>
+
+    <!-- REGISTER PANEL -->
+    <div id="authPanelRegister" class="auth-panel">
+      <div class="login-header">
+        <div class="login-icon">✨</div>
+        <h2>Buat Akun Baru</h2>
+        <p>Belanja lebih cepat & simpan alamat untuk estimasi ongkir</p>
+      </div>
+      <div class="login-form">
+        <div class="input-group">
+          <label>Nama Lengkap</label>
+          <input type="text" id="regName" placeholder="Nama kamu" />
+        </div>
+
+        <div class="input-group">
+          <label>Daftar Dengan</label>
+          <div class="method-toggle">
+            <button type="button" class="method-btn active" id="methodEmailBtn" onclick="setRegMethod('email')">📧 Email</button>
+            <button type="button" class="method-btn" id="methodPhoneBtn" onclick="setRegMethod('phone')">📱 No. HP</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label id="regIdLabel">Email</label>
+          <input type="text" id="regId" placeholder="email@kamu.com" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="regPass" placeholder="Minimal 6 karakter" />
+        </div>
+        <div class="input-group">
+          <label>Konfirmasi Password</label>
+          <input type="password" id="regPass2" placeholder="Ulangi password" />
+        </div>
+
+        <div class="input-group">
+          <label>Jenis Kelamin</label>
+          <div class="gender-toggle">
+            <button type="button" class="gender-btn" id="genderMaleBtn" onclick="setRegGender('L')">👦 Laki-laki</button>
+            <button type="button" class="gender-btn" id="genderFemaleBtn" onclick="setRegGender('P')">👧 Perempuan</button>
+            <button type="button" class="gender-btn" id="genderOtherBtn" onclick="setRegGender('X')">🧑 Lainnya</button>
+          </div>
+        </div>
+
+        <div class="input-group" id="avatarPickerWrap" style="display:none">
+          <label>Pilih Avatar Kamu</label>
+          <div id="avatarPicker" class="avatar-picker"></div>
+        </div>
+
+        <button onclick="doUserRegister()" class="btn-login">Daftar Sekarang</button>
+      </div>
+      <p class="auth-switch-text">Sudah punya akun? <a onclick="switchAuthTab('login')">Masuk di sini</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROFILE MODAL ===== -->
+<div id="profileModal" class="modal-overlay" onclick="closeProfileModal(event)">
+  <div class="modal-box profile-box">
+    <button onclick="closeProfileModal()" class="modal-close">✕</button>
+    <div class="profile-header">
+      <div id="profileAvatar" class="profile-avatar-lg"></div>
+      <h2 id="profileName">-</h2>
+      <p id="profileContact">-</p>
+    </div>
+    <div class="profile-section">
+      <h4>📍 Alamat Pengiriman Utama</h4>
+      <p class="profile-hint">Alamat ini otomatis dipakai untuk estimasi ongkir kurir saat checkout.</p>
+      <div class="co-form-grid">
+        <div class="co-input-group co-full">
+          <label>Nama Penerima</label>
+          <input type="text" id="pf_name" />
+        </div>
+        <div class="co-input-group">
+          <label>Nomor HP / WA</label>
+          <input type="tel" id="pf_phone" placeholder="08xxxxxxxxxx" />
+        </div>
+        <div class="co-input-group co-full">
+          <label>Alamat Lengkap</label>
+          <textarea id="pf_address" rows="2" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..."></textarea>
+        </div>
+        <div class="co-input-group">
+          <label>Kota / Kabupaten</label>
+          <input type="text" id="pf_city" placeholder="Contoh: Depok" />
+        </div>
+        <div class="co-input-group">
+          <label>Provinsi</label>
+          <input type="text" id="pf_province" placeholder="Contoh: Jawa Barat" />
+        </div>
+        <div class="co-input-group">
+          <label>Kode Pos</label>
+          <input type="text" id="pf_postal" placeholder="Contoh: 16412" />
+        </div>
+      </div>
+      <button onclick="saveProfileAddress()" class="btn-checkout profile-save-btn">💾 Simpan Alamat</button>
+    </div>
+    <button onclick="doUserLogout()" class="btn-logout-account">🚪 Keluar dari Akun</button>
+  </div>
+</div>
+
 <!-- AI CHATBOT -->
 <div id="chatbotOverlay" class="chatbot-overlay" onclick="closeChatbot(event)"></div>
 <div id="chatbotContainer" class="chatbot-container">
@@ -269,13 +423,16 @@
     </div>
 
     <div class="header-actions">
+      <button id="accountBtn" class="icon-btn account-btn" onclick="handleAccountClick()" title="Akun Saya">
+        <span id="accountBtnIcon">👤</span> <span class="icon-label" id="accountBtnLabel">Akun</span>
+      </button>
       <button class="icon-btn track-btn" onclick="openTrackingModal()" title="Lacak Paket">
         🔍 <span class="icon-label">Lacak</span>
       </button>
       <button class="icon-btn orders-btn" onclick="openMyOrders()" title="Pesanan Saya">
         📦 <span class="icon-label">Pesanan</span>
       </button>
-      <button class="icon-btn" onclick="openCart()">
+      <button class="icon-btn cart-btn" onclick="openCart()">
         🛒 <span id="cartBadge" class="badge">0</span>
       </button>
       <button class="icon-btn wishlist-btn" onclick="showPage('wishlist')">❤️ <span id="wishBadge" class="badge">0</span></button>
@@ -283,11 +440,14 @@
         ⚙️ Admin
         <span id="adminNotifBadge" class="admin-notif-badge" style="display:none">0</span>
       </button>
+      <button id="hamburgerBtn" class="hamburger-btn" onclick="openMobileDrawer()" title="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 
   <!-- CATEGORY NAV -->
-  <div class="category-nav">
+  <div class="category-nav" id="categoryNav">
     <button class="cat-btn active" onclick="filterCategory('all', this)">Semua</button>
     <button class="cat-btn" onclick="filterCategory('elektronik', this)">📱 Elektronik</button>
     <button class="cat-btn" onclick="filterCategory('fashion', this)">👗 Fashion</button>
@@ -297,6 +457,57 @@
     <button class="cat-btn" onclick="filterCategory('rumah', this)">🏠 Rumah</button>
   </div>
 </header>
+
+<!-- MOBILE DRAWER MENU -->
+<div id="mobileDrawerOverlay" class="drawer-overlay" onclick="closeMobileDrawer()"></div>
+<div id="mobileDrawer" class="mobile-drawer">
+  <div class="drawer-header">
+    <div class="drawer-brand">
+      <img src="favicon.png" alt="logo" class="logo-icon-img" onerror="this.style.display='none'" />
+      <span class="logo-text">@benyoriki<span>Store</span></span>
+    </div>
+    <button onclick="closeMobileDrawer()" class="drawer-close-btn">✕</button>
+  </div>
+  <div class="drawer-menu">
+    <button class="drawer-item" onclick="closeMobileDrawer(); openTrackingModal();">
+      <span class="drawer-item-icon">🔍</span> <span>Lacak Paket</span>
+    </button>
+    <button class="drawer-item" onclick="closeMobileDrawer(); openMyOrders();">
+      <span class="drawer-item-icon">📦</span> <span>Pesanan Saya</span>
+    </button>
+    <button class="drawer-item" onclick="closeMobileDrawer(); handleAccountClick();">
+      <span class="drawer-item-icon">👤</span> <span>Akun Saya</span>
+    </button>
+    <button class="drawer-item" onclick="toggleDarkMode()">
+      <span class="drawer-item-icon" id="drawerDarkIcon">🌙</span> <span id="drawerDarkLabel">Mode Gelap</span>
+    </button>
+  </div>
+  <div class="drawer-divider"></div>
+  <div class="drawer-footer">
+    <p class="drawer-footer-title">Butuh Bantuan?</p>
+    <a href="https://wa.me/6289xxxxxxxxx" target="_blank" rel="noopener" class="drawer-social">💬 Chat WhatsApp</a>
+    <a href="https://instagram.com/benyoriki" target="_blank" rel="noopener" class="drawer-social">📸 Instagram</a>
+  </div>
+</div>
+
+<!-- BOTTOM NAVIGATION (mobile only) -->
+<nav id="bottomNav" class="bottom-nav">
+  <button class="bn-item active" data-bn="shop" onclick="bnGoHome()">
+    <span class="bn-icon">🏠</span><span class="bn-label">Beranda</span>
+  </button>
+  <button class="bn-item" onclick="bnGoCategories()">
+    <span class="bn-icon">🗂️</span><span class="bn-label">Kategori</span>
+  </button>
+  <button class="bn-item" onclick="openCart()">
+    <span class="bn-icon">🛒<span id="cartBadgeBottom" class="bn-badge">0</span></span><span class="bn-label">Keranjang</span>
+  </button>
+  <button class="bn-item" data-bn="wishlist" onclick="showPage('wishlist')">
+    <span class="bn-icon">❤️<span id="wishBadgeBottom" class="bn-badge">0</span></span><span class="bn-label">Wishlist</span>
+  </button>
+  <button class="bn-item" onclick="handleAccountClick()">
+    <span class="bn-icon" id="bnAccountIcon">👤</span><span class="bn-label" id="bnAccountLabel">Akun</span>
+  </button>
+</nav>
 
 <!-- MAIN CONTENT -->
 <main id="mainContent">
