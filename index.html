@@ -7,7 +7,7 @@
 <meta property="og:url" content="https://onlintoko.netlify.app/">
 <meta property="og:title" content="@benyoriki Store - Belanja Online Praktis & Modern">
 <meta property="og:description" content="Platform e-commerce modern untuk kebutuhan harian Anda.">
-<meta property="og:image" content="preview.jpeg">
+<meta property="og:image" content="preview.jpg">
 <meta name="theme-color" content="#141221">
 <meta charset="UTF-8">
   
@@ -46,8 +46,8 @@
       </svg>
     </div>
     <div class="loader-brand">@benyoriki<span>Store</span></div>
-    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
     <div class="loader-percent" id="loaderPercent">0%</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
     <div class="loader-text" id="loaderText">Menyiapkan pengalaman belanja terbaikmu...</div>
   </div>
 </div>
@@ -455,6 +455,13 @@
     </div>
   </div>
 
+  <!-- DEMO / TESTING NOTICE -->
+  <div id="demoNotice" class="demo-notice">
+    <span class="demo-notice-icon">🧪</span>
+    <p><strong>Situs Uji Coba</strong> — Ini demo tampilan &amp; server, bukan toko jual-beli sungguhan. Semua produk, harga, dan pesanan hanya contoh untuk keperluan testing.</p>
+    <button class="demo-notice-close" onclick="closeDemoNotice()" aria-label="Tutup pemberitahuan">✕</button>
+  </div>
+
   <!-- CATEGORY NAV -->
   <div class="category-nav" id="categoryNav">
     <button class="cat-btn active" onclick="filterCategory('all', this)">Semua</button>
@@ -528,7 +535,7 @@
     <!-- HERO BANNER -->
     <div class="hero-banner">
       <div class="hero-slides-wrapper" id="heroSlider">
-        <div class="hero-slide active" style="background: linear-gradient(135deg, #FF4D2E 0%, #B4142D 100%)">
+        <div class="hero-slide active" style="background: linear-gradient(135deg, #FF6A3D 0%, #FF4D2E 45%, #B4142D 100%)">
           <div class="hero-text">
             <span class="hero-tag">🔥 Flash Sale Hari Ini</span>
             <h2>Diskon Hingga<br><strong>70% OFF</strong></h2>
@@ -537,7 +544,7 @@
           </div>
           <div class="hero-img"><img src="favicon.png" alt="logo" class="logo1-icon-img" onerror="this.style.display='none'" /></div>
         </div>
-        <div class="hero-slide" style="background: linear-gradient(135deg, #4C1D95 0%, #2563EB 100%)">
+        <div class="hero-slide" style="background: linear-gradient(135deg, #4C1D95 0%, #7C5CFC 55%, #2563EB 100%)">
           <div class="hero-text">
             <span class="hero-tag">✨ Produk Baru</span>
             <h2>Teknologi<br><strong>Terkini 2026</strong></h2>
@@ -546,7 +553,7 @@
           </div>
           <div class="hero-img">📱</div>
         </div>
-        <div class="hero-slide" style="background: linear-gradient(135deg, #0F9E8C 0%, #0EA5A0 100%)">
+        <div class="hero-slide" style="background: linear-gradient(135deg, #0B7E70 0%, #0F9E8C 50%, #2FE0C8 100%)">
           <div class="hero-text">
             <span class="hero-tag">📦 Lacak Paket Mudah</span>
             <h2>Pantau Paket<br><strong>Real-Time</strong></h2>
