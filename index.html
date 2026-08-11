@@ -455,6 +455,8 @@
     <button class="cat-btn" onclick="filterCategory('kecantikan', this)">💄 Kecantikan</button>
     <button class="cat-btn" onclick="filterCategory('olahraga', this)">⚽ Olahraga</button>
     <button class="cat-btn" onclick="filterCategory('rumah', this)">🏠 Rumah</button>
+    <button class="cat-btn" onclick="filterCategory('hewan', this)">🐾 Hewan</button>
+    <button class="cat-btn" onclick="filterCategory('otomotif', this)">🚗 Otomotif</button>
   </div>
 </header>
 
@@ -585,15 +587,19 @@
 
     <!-- ALL PRODUCTS -->
     <div class="section-header">
-      <div class="section-title"><h3>🏪 Semua Produk</h3></div>
-      <div class="sort-control">
-        <select onchange="sortProducts(this.value)">
-          <option value="default">Urutkan</option>
-          <option value="price-asc">Harga Terendah</option>
-          <option value="price-desc">Harga Tertinggi</option>
-          <option value="rating">Rating Terbaik</option>
-          <option value="newest">Terbaru</option>
-        </select>
+      <div class="section-title"><h3>🛍️ Semua Produk</h3></div>
+      <div class="sort-control" id="sortControl">
+        <button type="button" class="sort-trigger" onclick="toggleSortMenu(event)">
+          <span id="sortTriggerLabel">Urutkan</span>
+          <svg class="sort-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="sort-menu" id="sortMenu">
+          <button class="sort-option active" data-val="default" onclick="sortProducts('default', this)">Urutkan</button>
+          <button class="sort-option" data-val="price-asc" onclick="sortProducts('price-asc', this)">💰 Harga Terendah</button>
+          <button class="sort-option" data-val="price-desc" onclick="sortProducts('price-desc', this)">💎 Harga Tertinggi</button>
+          <button class="sort-option" data-val="rating" onclick="sortProducts('rating', this)">⭐ Rating Terbaik</button>
+          <button class="sort-option" data-val="newest" onclick="sortProducts('newest', this)">✨ Terbaru</button>
+        </div>
       </div>
     </div>
     <div id="productList" class="product-grid"></div>
@@ -698,6 +704,8 @@
                   <option value="kecantikan">💄 Kecantikan</option>
                   <option value="olahraga">⚽ Olahraga</option>
                   <option value="rumah">🏠 Rumah</option>
+                  <option value="hewan">🐾 Hewan</option>
+                  <option value="otomotif">🚗 Otomotif</option>
                 </select>
               </div>
             </div>
