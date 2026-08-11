@@ -184,9 +184,10 @@ function renderCard(p, idx) {
   const stockPct = Math.min(100, (p.stock / 50) * 100);
   const isLowStock = p.stock <= 5 && p.stock > 0;
   return `
-    <div class="product-card" onclick="openModal(${idx})">
+    <div class="product-card reveal-up" onclick="openModal(${idx})">
       <div class="card-img-wrap">
-        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image'" loading="lazy" />
+        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image'; this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" onload="this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" loading="lazy" />
+        <div class="card-quick-view"><span>👁 Lihat Detail</span></div>
         <div class="card-badges">
           ${disc > 0 ? `<span class="badge-discount">-${disc}%</span>` : ""}
           ${p.flash ? `<span class="badge-flash">⚡ Flash</span>` : ""}
@@ -231,6 +232,15 @@ function renderShop(filtered = null) {
     productList.innerHTML = list.map(p => renderCard(p, products.indexOf(p))).join("");
   }
   document.getElementById("statProducts").textContent = products.length;
+  initScrollReveal();
+}
+
+let statProductsAnimated = false;
+function animateStatProductsOnce() {
+  if (statProductsAnimated) return;
+  statProductsAnimated = true;
+  const el = document.getElementById("statProducts");
+  if (el) animateCount(el, products.length, 0);
 }
 
 // ===== FILTER & SORT =====
@@ -282,7 +292,7 @@ document.addEventListener("click", (e) => {
   const ctrl = document.getElementById("sortControl");
   if (ctrl && !ctrl.contains(e.target)) closeSortMenu();
 });
-function handleSearch() { renderShop(); }
+function handleSearch() { renderShop(); renderSearchSuggest(); }
 
 // ===== WISHLIST =====
 function toggleWishlist(e, id) {
@@ -329,9 +339,18 @@ function addToCart(e, id) {
 
 function updateCartBadge() {
   const total = cart.reduce((sum, c) => sum + c.qty, 0);
-  document.getElementById("cartBadge").textContent = total;
+  const badge = document.getElementById("cartBadge");
+  badge.textContent = total;
+  badge.classList.remove("badge-bump");
+  void badge.offsetWidth;
+  badge.classList.add("badge-bump");
   const b = document.getElementById("cartBadgeBottom");
-  if (b) b.textContent = total;
+  if (b) {
+    b.textContent = total;
+    b.classList.remove("badge-bump");
+    void b.offsetWidth;
+    b.classList.add("badge-bump");
+  }
 }
 
 function openCart() {
@@ -1315,7 +1334,9 @@ function updateCountdown() {
   const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
   const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
   const el = document.getElementById("countdown");
-  if (el) el.textContent = `${h}:${m}:${s}`;
+  if (el) {
+    el.innerHTML = `<span class="countdown-segs"><span class="countdown-seg">${h}</span><span class="countdown-sep">:</span><span class="countdown-seg">${m}</span><span class="countdown-sep">:</span><span class="countdown-seg">${s}</span></span>`;
+  }
 }
 
 // ===== AI CHATBOT =====
@@ -1699,6 +1720,9 @@ window.addEventListener("DOMContentLoaded", () => {
   startHeroSlider();
   initBackToTop();
   updateAccountUI();
+  initScrollReveal();
+  initStatCounters();
+  initSearchSuggest();
 
   // Inject payment methods
   const pmContainer = document.getElementById("paymentMethodsList");
@@ -1709,6 +1733,91 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   setTimeout(() => { const badge = document.getElementById("chatFabBadge"); if (badge) badge.style.display = "flex"; }, 3000);
 });
+
+// ===== SCROLL REVEAL (fade-in-up on view) =====
+let revealObserver = null;
+function initScrollReveal() {
+  if (!("IntersectionObserver" in window)) return;
+  if (revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("revealed");
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+  document.querySelectorAll(".reveal-up:not(.revealed)").forEach(el => revealObserver.observe(el));
+}
+
+// ===== ANIMATED STAT COUNT-UP =====
+function initStatCounters() {
+  animateStatProductsOnce();
+  document.querySelectorAll("[data-count-to]").forEach(el => {
+    const end = parseFloat(el.getAttribute("data-count-to"));
+    const decimals = el.getAttribute("data-count-decimals") ? parseInt(el.getAttribute("data-count-decimals")) : 0;
+    animateCount(el, end, decimals);
+  });
+}
+
+function animateCount(el, end, decimals = 0) {
+  const duration = 1200;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const val = end * eased;
+    el.textContent = decimals > 0 ? val.toFixed(decimals) : Math.round(val).toLocaleString("id-ID");
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = decimals > 0 ? end.toFixed(decimals) : end.toLocaleString("id-ID");
+  }
+  requestAnimationFrame(tick);
+}
+
+// ===== SEARCH AUTOCOMPLETE =====
+function initSearchSuggest() {
+  const input = document.getElementById("searchInput");
+  const box = document.getElementById("searchSuggest");
+  if (!input || !box) return;
+  input.addEventListener("focus", () => renderSearchSuggest());
+  document.addEventListener("click", (e) => {
+    if (!box.contains(e.target) && e.target !== input) box.classList.remove("show");
+  });
+}
+
+function renderSearchSuggest() {
+  const input = document.getElementById("searchInput");
+  const box = document.getElementById("searchSuggest");
+  if (!input || !box) return;
+  const q = input.value.trim().toLowerCase();
+  if (!q) { box.classList.remove("show"); return; }
+  const matches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 6);
+  if (matches.length === 0) {
+    box.innerHTML = `<div class="search-suggest-empty">Tidak ada produk cocok dengan "${q}"</div>`;
+  } else {
+    box.innerHTML = matches.map(p => `
+      <div class="search-suggest-item" onclick="selectSearchSuggest(${p.id})">
+        <img class="ssi-thumb" src="${p.image}" onerror="this.style.visibility='hidden'" />
+        <span class="ssi-name">${p.name}</span>
+        <span class="ssi-price">${formatRp(p.price)}</span>
+      </div>
+    `).join("");
+  }
+  box.classList.add("show");
+}
+
+function selectSearchSuggest(id) {
+  const box = document.getElementById("searchSuggest");
+  if (box) box.classList.remove("show");
+  const idx = products.findIndex(p => p.id === id);
+  if (idx > -1) openModal(idx);
+}
+
+// ===== NEWSLETTER (demo) =====
+function handleNewsletterSubmit(form) {
+  showToast("Terima kasih! (ini demo, belum terhubung email sungguhan)", "📬");
+  form.reset();
+}
 
 // ===== PAGE LOADER =====
 (function () {
