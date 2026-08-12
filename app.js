@@ -113,6 +113,9 @@ function showToast(msg, emoji = "✅") {
 }
 
 // ===== DARK MODE =====
+const ICON_MOON = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+const ICON_SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
+
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle("dark");
   document.getElementById("darkModeBtn").textContent = isDark ? "☀️" : "🌙";
@@ -123,7 +126,9 @@ function toggleDarkMode() {
 function syncDrawerDarkMode(isDark) {
   const icon = document.getElementById("drawerDarkIcon");
   const label = document.getElementById("drawerDarkLabel");
-  if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+  const wrap = document.getElementById("drawerDarkIconWrap");
+  if (icon) icon.innerHTML = isDark ? ICON_SUN : ICON_MOON;
+  if (wrap) { wrap.classList.toggle("di-gold", !isDark); wrap.classList.toggle("di-orange", isDark); }
   if (label) label.textContent = isDark ? "Mode Terang" : "Mode Gelap";
 }
 
@@ -373,6 +378,9 @@ function renderWishlist() {
   const wishedProducts = products.filter(p => wishlist.includes(p.id));
   if (wishedProducts.length === 0) { grid.innerHTML = ""; empty.style.display = "block"; }
   else { empty.style.display = "none"; grid.innerHTML = wishedProducts.map(p => renderCard(p, products.indexOf(p))).join(""); }
+  initScrollReveal();
+  initCardCarouselHover();
+  document.querySelectorAll("#wishlistGrid .reveal-up").forEach(el => el.classList.add("revealed"));
 }
 
 // ===== CART =====
@@ -1351,6 +1359,7 @@ function showPage(page) {
   target.classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (page === "wishlist") renderWishlist();
+  if (page === "coin") renderCoinPage();
   if (page === "admin" && !isAdmin) { handleAdminClick(); return; }
   document.querySelectorAll(".bn-item[data-bn]").forEach(el => {
     el.classList.toggle("active", el.dataset.bn === page);
@@ -1779,6 +1788,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initStatCounters();
   initSearchSuggest();
   initCardTilt();
+  initCoinSystem();
 
   // Inject payment methods
   const pmContainer = document.getElementById("paymentMethodsList");
@@ -1933,3 +1943,172 @@ function handleNewsletterSubmit(form) {
   window.addEventListener("load", hideLoader);
   setTimeout(hideLoader, FALLBACK_MS);
 })();
+// =====================================================================
+// ===== KOIN SAYA — daily check-in streak + golden egg (gamifikasi)
+// =====================================================================
+const COIN_REWARDS = [10, 15, 20, 25, 30, 40, 100]; // Hari 1..7
+
+function todayStr(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
+
+function loadCoinState() {
+  try {
+    const raw = localStorage.getItem("rky_coin_state");
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { balance: 0, streakDay: 0, lastClaimDate: null, eggLastOpen: null };
+}
+
+function saveCoinState(state) {
+  localStorage.setItem("rky_coin_state", JSON.stringify(state));
+}
+
+function getCoinClaimInfo(state) {
+  const today = todayStr(0);
+  const yesterday = todayStr(-1);
+  const alreadyClaimedToday = state.lastClaimDate === today;
+  let nextDay;
+  if (alreadyClaimedToday) {
+    nextDay = state.streakDay;
+  } else if (state.lastClaimDate === yesterday) {
+    nextDay = (state.streakDay % 7) + 1;
+  } else {
+    nextDay = 1;
+  }
+  return { today, alreadyClaimedToday, nextDay };
+}
+
+function initCoinSystem() {
+  const state = loadCoinState();
+  const { alreadyClaimedToday, nextDay } = getCoinClaimInfo(state);
+  const eggAvailable = state.eggLastOpen !== todayStr(0);
+  const rewardAmt = COIN_REWARDS[nextDay - 1];
+
+  const promoTitle = document.getElementById("coinPromoTitle");
+  const promoDesc = document.getElementById("coinPromoDesc");
+  const drawerSub = document.getElementById("drawerCoinSub");
+
+  let text;
+  if (!alreadyClaimedToday && eggAvailable) {
+    text = `+${rewardAmt} koin & telur emas menanti!`;
+  } else if (!alreadyClaimedToday) {
+    text = `+${rewardAmt} koin check-in menanti!`;
+  } else if (eggAvailable) {
+    text = `Masih ada telur emas hari ini!`;
+  } else {
+    text = `Sudah diklaim semua, balik besok ya!`;
+  }
+  if (promoTitle) promoTitle.textContent = state.balance > 0 ? `Koin kamu: ${state.balance.toLocaleString("id-ID")} 🪙` : "Klaim Koin Harianmu!";
+  if (promoDesc) promoDesc.textContent = text;
+  if (drawerSub) drawerSub.textContent = (!alreadyClaimedToday || eggAvailable) ? text : "Sudah diklaim hari ini";
+}
+
+function renderCoinPage() {
+  const state = loadCoinState();
+  const { today, alreadyClaimedToday, nextDay } = getCoinClaimInfo(state);
+
+  animateCount(document.getElementById("coinBalanceNum"), state.balance, 0);
+  document.getElementById("coinExpiryNote").textContent = state.balance > 0 ? "Koin berlaku untuk simulasi & tidak memiliki nilai tukar sungguhan." : "Mulai check-in harian buat kumpulin koin!";
+
+  // Streak grid
+  const checkedUpTo = alreadyClaimedToday ? nextDay : nextDay - 1;
+  const grid = document.getElementById("coinStreakGrid");
+  grid.innerHTML = COIN_REWARDS.map((amt, i) => {
+    const dayNum = i + 1;
+    const isChecked = dayNum <= checkedUpTo;
+    const isActive = dayNum === nextDay;
+    const cls = ["coin-day", isChecked ? "checked" : "", isActive ? "active" : ""].filter(Boolean).join(" ");
+    return `
+      <div class="${cls}">
+        <span class="coin-day-amt">${isChecked ? "✓" : "+" + amt}</span>
+        <span class="coin-day-label">Hari ${dayNum}</span>
+      </div>`;
+  }).join("");
+
+  document.getElementById("coinStreakBadge").textContent = `Hari ke-${nextDay}`;
+
+  const btn = document.getElementById("coinClaimBtn");
+  if (alreadyClaimedToday) {
+    btn.textContent = "✓ Sudah Diklaim Hari Ini";
+    btn.disabled = true;
+    btn.classList.add("claimed");
+  } else {
+    btn.textContent = `Klaim Hadiah Hari Ini (+${COIN_REWARDS[nextDay - 1]} Koin)`;
+    btn.disabled = false;
+    btn.classList.remove("claimed");
+  }
+
+  // Egg state
+  const eggAvailable = state.eggLastOpen !== today;
+  const egg = document.getElementById("coinEgg");
+  const eggStatus = document.getElementById("coinEggStatus");
+  const eggReward = document.getElementById("coinEggReward");
+  const eggEmoji = document.getElementById("coinEggEmoji");
+  eggReward.style.display = "none";
+  egg.style.display = "flex";
+  if (eggAvailable) {
+    egg.classList.remove("opened");
+    eggEmoji.textContent = "🥚";
+    eggStatus.textContent = "Ketuk telurnya untuk buka hadiah!";
+  } else {
+    egg.classList.add("opened");
+    eggEmoji.textContent = "🐣";
+    eggStatus.textContent = "Sudah dibuka hari ini — balik lagi besok ya! 🌙";
+  }
+
+  initCoinSystem();
+}
+
+function claimDailyCoin() {
+  const state = loadCoinState();
+  const { alreadyClaimedToday, nextDay, today } = getCoinClaimInfo(state);
+  if (alreadyClaimedToday) return;
+  const reward = COIN_REWARDS[nextDay - 1];
+  state.balance += reward;
+  state.streakDay = nextDay;
+  state.lastClaimDate = today;
+  saveCoinState(state);
+  showToast(`+${reward} Koin diklaim!`, "🪙");
+  renderCoinPage();
+  updateCoinBalanceBump();
+}
+
+function openGoldenEgg() {
+  const state = loadCoinState();
+  const today = todayStr(0);
+  if (state.eggLastOpen === today) return;
+  const egg = document.getElementById("coinEgg");
+  const eggEmoji = document.getElementById("coinEggEmoji");
+  const eggReward = document.getElementById("coinEggReward");
+  const eggStatus = document.getElementById("coinEggStatus");
+
+  egg.classList.add("cracking");
+  eggEmoji.textContent = "🐣";
+  setTimeout(() => {
+    const reward = Math.floor(Math.random() * 91) + 10; // 10-100
+    state.balance += reward;
+    state.eggLastOpen = today;
+    saveCoinState(state);
+
+    egg.classList.remove("cracking");
+    egg.classList.add("opened");
+    eggReward.textContent = `🎉 +${reward} Koin!`;
+    eggReward.style.display = "block";
+    eggStatus.textContent = "Sudah dibuka hari ini — balik lagi besok ya! 🌙";
+    animateCount(document.getElementById("coinBalanceNum"), state.balance, 0);
+    showToast(`Telur emas terbuka! +${reward} Koin`, "🥚");
+    initCoinSystem();
+    updateCoinBalanceBump();
+  }, 650);
+}
+
+function updateCoinBalanceBump() {
+  const el = document.getElementById("coinBalanceNum");
+  if (!el) return;
+  el.classList.remove("badge-bump");
+  void el.offsetWidth;
+  el.classList.add("badge-bump");
+}
