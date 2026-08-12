@@ -174,21 +174,53 @@ function initBackToTop() {
       if (window.scrollY > 400) btn.classList.add("visible");
       else btn.classList.remove("visible");
     }
-  });
+    const header = document.getElementById("mainHeader");
+    if (header) {
+      if (window.scrollY > 40) header.classList.add("header-shrink");
+      else header.classList.remove("header-shrink");
+    }
+  }, { passive: true });
+}
+
+// ===== 3D TILT ON PRODUCT CARDS (desktop / hover-capable only) =====
+function initCardTilt() {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.addEventListener("mousemove", (e) => {
+    const card = e.target.closest && e.target.closest(".product-card");
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    const rx = (py - 0.5) * -8;
+    const ry = (px - 0.5) * 8;
+    card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+  }, { passive: true });
+  document.addEventListener("mouseout", (e) => {
+    const card = e.target.closest && e.target.closest(".product-card");
+    if (card && !card.contains(e.relatedTarget)) card.style.transform = "";
+  }, { passive: true });
 }
 
 // ===== RENDER PRODUCT CARD =====
-function renderCard(p, idx) {
+function renderCard(p, idx, opts = {}) {
   const disc = discountPct(p.price, p.origPrice);
   const isWished = wishlist.includes(p.id);
   const stockPct = Math.min(100, (p.stock / 50) * 100);
   const isLowStock = p.stock <= 5 && p.stock > 0;
+  const isBentoWide = opts.bento && opts.pos % 6 === 0;
+  const isAiPick = p.rating >= 4.8 && (p.sold || 0) > 150;
+  // Second demo "angle" image (dummy multi-photo effect via crop params — real data will have true multi-photos)
+  const img2 = p.image.includes("?") ? p.image + "&crop=entropy&fit=crop&sat=-15" : p.image + "?crop=entropy&fit=crop&sat=-15";
   return `
-    <div class="product-card reveal-up" onclick="openModal(${idx})">
-      <div class="card-img-wrap">
-        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image'; this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" onload="this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" loading="lazy" />
+    <div class="product-card reveal-up ${isBentoWide ? "card-wide" : ""}" onclick="openModal(${idx})">
+      <div class="card-img-wrap card-carousel" data-active="0">
+        <img class="ci-img ci-img-0 img-active" src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image'; this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" onload="this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" loading="lazy" />
+        <img class="ci-img ci-img-1" src="${img2}" alt="${p.name}" loading="lazy" />
+        <div class="card-carousel-dots"><span class="ccd active"></span><span class="ccd"></span></div>
         <div class="card-quick-view"><span>👁 Lihat Detail</span></div>
         <div class="card-badges">
+          ${isAiPick ? `<span class="badge-ai">✨ AI Pick</span>` : ""}
           ${disc > 0 ? `<span class="badge-discount">-${disc}%</span>` : ""}
           ${p.flash ? `<span class="badge-flash">⚡ Flash</span>` : ""}
           ${p.stock <= 0 ? `<span class="badge-discount">Habis</span>` : ""}
@@ -204,7 +236,7 @@ function renderCard(p, idx) {
         </div>
         <div class="card-meta">
           <span class="card-rating">${renderStars(p.rating)} ${p.rating}</span>
-          <span class="card-sold">${(p.sold || 0).toLocaleString("id-ID")} terjual</span>
+          <span class="card-sold"><span class="mini-avatars"><i></i><i></i><i></i></span>${(p.sold || 0).toLocaleString("id-ID")} terjual</span>
         </div>
         <div class="card-stock ${isLowStock ? "low" : ""}">
           ${p.stock <= 0 ? "❌ Stok habis" : isLowStock ? `⚠️ Sisa ${p.stock} lagi!` : `📦 Stok: ${p.stock}`}
@@ -229,10 +261,33 @@ function renderShop(filtered = null) {
     emptyState.style.display = "block";
   } else {
     emptyState.style.display = "none";
-    productList.innerHTML = list.map(p => renderCard(p, products.indexOf(p))).join("");
+    productList.innerHTML = list.map((p, i) => renderCard(p, products.indexOf(p), { bento: true, pos: i })).join("");
   }
   document.getElementById("statProducts").textContent = products.length;
   initScrollReveal();
+  initCardCarouselHover();
+}
+
+function initCardCarouselHover() {
+  document.querySelectorAll(".card-carousel").forEach(wrap => {
+    if (wrap.dataset.bound) return;
+    wrap.dataset.bound = "1";
+    const img0 = wrap.querySelector(".ci-img-0");
+    const img1 = wrap.querySelector(".ci-img-1");
+    const dots = wrap.querySelectorAll(".ccd");
+    wrap.addEventListener("mouseenter", () => {
+      if (!img1) return;
+      img1.classList.add("img-active");
+      img0.classList.remove("img-active");
+      dots.forEach((d, i) => d.classList.toggle("active", i === 1));
+    });
+    wrap.addEventListener("mouseleave", () => {
+      if (!img1) return;
+      img1.classList.remove("img-active");
+      img0.classList.add("img-active");
+      dots.forEach((d, i) => d.classList.toggle("active", i === 0));
+    });
+  });
 }
 
 let statProductsAnimated = false;
@@ -1723,6 +1778,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initScrollReveal();
   initStatCounters();
   initSearchSuggest();
+  initCardTilt();
 
   // Inject payment methods
   const pmContainer = document.getElementById("paymentMethodsList");
