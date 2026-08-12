@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta name="title" content="@benyoriki Store - Toko Online Modern & Terpercaya">
-<meta name="description" content="Belanja mudah, cepat, dan aman di @benyoriki Store.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://onlintoko.netlify.app/">
-<meta property="og:title" content="@benyoriki Store - Belanja Online Praktis & Modern">
-<meta property="og:description" content="Platform e-commerce modern untuk kebutuhan harian Anda.">
-<meta property="og:image" content="preview.jpg">
-<meta name="theme-color" content="#141221">
 <meta charset="UTF-8">
-  
-  <!-- Open Graph / WhatsApp / Facebook --><meta property="og:type" content="website">
-<meta property="og:url" content="https://benyoriki.github.io/Toko-Online/"><meta property="og:title" content="🛍️ Toko Online — Belanja Mudah, Cepat & Aman"><meta property="og:description" content="Temukan berbagai produk pilihan dengan harga menarik. Belanja online lebih mudah, cepat, nyaman, dan aman hanya di Toko Online."><meta property="og:image" content="https://benyoriki.github.io/Toko-Online/preview.jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630"><!-- Twitter / X --><meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="🛍️ Toko Online — Belanja Mudah, Cepat & Aman">
-<meta name="twitter:description" content="Belanja berbagai produk pilihan dengan harga menarik. Nikmati pengalaman belanja online yang mudah, cepat, nyaman, dan aman.">
-<meta name="twitter:image" content="https://benyoriki.github.io/Toko-Online/preview.jpeg">
-  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>@benyoriki Store — Belanja Mudah, Harga Terbaik</title>
+<meta name="title" content="@benyoriki Store - Toko Online Modern & Terpercaya">
+<meta name="description" content="Belanja mudah, cepat, dan aman di @benyoriki Store. Temukan berbagai produk pilihan dengan harga menarik.">
+<meta name="theme-color" content="#141221">
+
+<!-- Open Graph / WhatsApp / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://benyoriki.github.io/Toko-Online/">
+<meta property="og:title" content="🛍️ @benyoriki Store — Belanja Mudah, Cepat & Aman">
+<meta property="og:description" content="Temukan berbagai produk pilihan dengan harga menarik. Belanja online lebih mudah, cepat, nyaman, dan aman hanya di @benyoriki Store.">
+<meta property="og:image" content="https://benyoriki.github.io/Toko-Online/preview.jpeg">
+<meta property="og:image:secure_url" content="https://benyoriki.github.io/Toko-Online/preview.jpeg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="@benyoriki Store">
+<meta property="og:locale" content="id_ID">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🛍️ @benyoriki Store — Belanja Mudah, Cepat & Aman">
+<meta name="twitter:description" content="Belanja berbagai produk pilihan dengan harga menarik. Nikmati pengalaman belanja online yang mudah, cepat, nyaman, dan aman.">
+<meta name="twitter:image" content="https://benyoriki.github.io/Toko-Online/preview.jpeg">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -426,9 +432,12 @@
       <span class="logo-text">@benyoriki<span>Store</span></span>
     </div>
 
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Cari produk, brand, kategori..." oninput="handleSearch()" />
-      <button class="search-btn">🔍</button>
+    <div class="search-bar-wrap">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Cari produk, brand, kategori..." oninput="handleSearch()" autocomplete="off" />
+        <button class="search-btn">🔍</button>
+      </div>
+      <div class="search-suggest" id="searchSuggest"></div>
     </div>
 
     <div class="header-actions">
@@ -464,15 +473,15 @@
 
   <!-- CATEGORY NAV -->
   <div class="category-nav" id="categoryNav">
-    <button class="cat-btn active" onclick="filterCategory('all', this)">Semua</button>
-    <button class="cat-btn" onclick="filterCategory('elektronik', this)">📱 Elektronik</button>
-    <button class="cat-btn" onclick="filterCategory('fashion', this)">👗 Fashion</button>
-    <button class="cat-btn" onclick="filterCategory('makanan', this)">🍔 Makanan</button>
-    <button class="cat-btn" onclick="filterCategory('kecantikan', this)">💄 Kecantikan</button>
-    <button class="cat-btn" onclick="filterCategory('olahraga', this)">⚽ Olahraga</button>
-    <button class="cat-btn" onclick="filterCategory('rumah', this)">🏠 Rumah</button>
-    <button class="cat-btn" onclick="filterCategory('hewan', this)">🐾 Hewan</button>
-    <button class="cat-btn" onclick="filterCategory('otomotif', this)">🚗 Otomotif</button>
+    <button class="cat-btn active" onclick="filterCategory('all', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Semua</button>
+    <button class="cat-btn" onclick="filterCategory('elektronik', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>Elektronik</button>
+    <button class="cat-btn" onclick="filterCategory('fashion', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l4 3-3 4-1-2v11H8V9L7 11l-3-4 4-3 4 2z"/></svg>Fashion</button>
+    <button class="cat-btn" onclick="filterCategory('makanan', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a4 4 0 004 4V2M7 13v9M3 2v7M11 2v20M18 2c-2 2-3 4-3 7a3 3 0 003 3v9"/></svg>Makanan</button>
+    <button class="cat-btn" onclick="filterCategory('kecantikan', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.8 4.6L18 9l-4.2 2.4L12 16l-1.8-4.6L6 9l4.2-2.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>Kecantikan</button>
+    <button class="cat-btn" onclick="filterCategory('olahraga', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M4 9l3-3 3 3-3 3zM14 19l3-3 3 3-3 3zM17 4l3 3-1.5 1.5L15.5 5.5zM4.5 15.5L6 17l3-3-1.5-1.5z"/></svg>Olahraga</button>
+    <button class="cat-btn" onclick="filterCategory('rumah', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Rumah</button>
+    <button class="cat-btn" onclick="filterCategory('hewan', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="9" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="9" r="2"/><path d="M12 21c-3 0-5-2-5-4.5S9 13 12 13s5 1 5 3.5S15 21 12 21z"/></svg>Hewan</button>
+    <button class="cat-btn" onclick="filterCategory('otomotif', this)"><svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2-6h14l2 6"/><path d="M3 13h18v5H3z"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/></svg>Otomotif</button>
   </div>
 </header>
 
@@ -573,9 +582,9 @@
     <!-- STATS BAR -->
     <div class="stats-bar">
       <div class="stat-item"><span class="stat-icon">📦</span><div><strong id="statProducts">0</strong><small>Produk</small></div></div>
-      <div class="stat-item"><span class="stat-icon">⭐</span><div><strong>4.9</strong><small>Rating</small></div></div>
-      <div class="stat-item"><span class="stat-icon">🚚</span><div><strong>6 Kurir</strong><small>Tersedia</small></div></div>
-      <div class="stat-item"><span class="stat-icon">🔄</span><div><strong>30 Hari</strong><small>Return</small></div></div>
+      <div class="stat-item"><span class="stat-icon">⭐</span><div><strong><span data-count-to="4.9" data-count-decimals="1">0</span></strong><small>Rating</small></div></div>
+      <div class="stat-item"><span class="stat-icon">🚚</span><div><strong><span data-count-to="6" data-count-decimals="0">0</span> Kurir</strong><small>Tersedia</small></div></div>
+      <div class="stat-item"><span class="stat-icon">🔄</span><div><strong><span data-count-to="30" data-count-decimals="0">0</span> Hari</strong><small>Return</small></div></div>
     </div>
 
     <!-- AI PROMO BANNER -->
@@ -811,6 +820,17 @@
 
 <!-- FOOTER -->
 <footer>
+  <div class="footer-newsletter">
+    <div class="footer-newsletter-text">
+      <h4>📬 Jangan Lewatkan Promo</h4>
+      <p>Daftar buat dapat info diskon &amp; produk baru duluan (demo — belum terhubung email sungguhan).</p>
+    </div>
+    <form class="footer-newsletter-form" onsubmit="event.preventDefault(); handleNewsletterSubmit(this);">
+      <input type="email" placeholder="Masukkan email kamu" required />
+      <button type="submit">Berlangganan →</button>
+    </form>
+  </div>
+  <div class="footer-divider"></div>
   <div class="footer-inner">
     <div class="footer-brand">
       <div class="logo"><img src="favicon.png" alt="logo" class="logo-icon-img" onerror="this.style.display='none'" /><span class="logo-text">@Benyoriki<span>Store</span></span></div>
