@@ -39,6 +39,7 @@
 <div id="pageLoader" class="page-loader">
   <div class="loader-content">
     <div class="loader-cart">
+      <div class="loader-progress-ring" id="loaderProgressRing" style="--pct:1"></div>
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21 8H6" stroke="url(#lc-grad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         <circle cx="9" cy="21" r="1.4" fill="#FF4D2E"/>
@@ -52,7 +53,7 @@
       </svg>
     </div>
     <div class="loader-brand">@benyoriki<span>Store</span></div>
-    <div class="loader-percent" id="loaderPercent">0%</div>
+    <div class="loader-percent" id="loaderPercent">1%</div>
     <div class="loader-bar"><div class="loader-bar-fill"></div></div>
     <div class="loader-text" id="loaderText">Menyiapkan pengalaman belanja terbaikmu...</div>
   </div>
@@ -500,6 +501,11 @@
     <button onclick="closeMobileDrawer()" class="drawer-close-btn">✕</button>
   </div>
   <div class="drawer-menu">
+    <button class="drawer-item drawer-item-coin" onclick="closeMobileDrawer(); showPage('coin');">
+      <span class="drawer-item-icon di-coin"><span class="di-coin-emoji">🪙</span></span>
+      <span class="drawer-item-text">Koin Saya<span class="drawer-coin-sub" id="drawerCoinSub">Klaim hadiah harian</span></span>
+      <span class="drawer-item-arrow">›</span>
+    </button>
     <button class="drawer-item" onclick="closeMobileDrawer(); openTrackingModal();">
       <span class="drawer-item-icon di-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
       <span class="drawer-item-text">Lacak Paket</span>
@@ -633,6 +639,18 @@
       </div>
     </div>
 
+    <!-- COIN PROMO BANNER -->
+    <div class="coin-promo-banner" onclick="showPage('coin')">
+      <div class="coin-promo-left">
+        <span class="coin-promo-icon">🪙</span>
+        <div>
+          <strong id="coinPromoTitle">Klaim Koin Harianmu!</strong>
+          <p id="coinPromoDesc">Check-in tiap hari + buka telur emas buat koin gratis</p>
+        </div>
+      </div>
+      <span class="coin-promo-cta">Klaim →</span>
+    </div>
+
     <!-- FLASH SALE SECTION -->
     <div class="section-header">
       <div class="section-title">
@@ -678,6 +696,46 @@
       <div class="empty-icon">💔</div>
       <h3>Wishlist kosong</h3>
       <p>Tambahkan produk favorit kamu di sini</p>
+    </div>
+  </section>
+
+  <!-- KOIN SAYA PAGE -->
+  <section id="coinPage" class="page">
+    <div class="coin-hero">
+      <div class="coin-hero-glow"></div>
+      <button class="coin-back-btn" onclick="showPage('shop')">← Kembali</button>
+      <div class="coin-balance-row">
+        <span class="coin-balance-icon">🪙</span>
+        <div>
+          <div class="coin-balance-num" id="coinBalanceNum">0</div>
+          <div class="coin-balance-label">Koin @benyoriki</div>
+        </div>
+      </div>
+      <p class="coin-expiry-note" id="coinExpiryNote"></p>
+    </div>
+
+    <div class="coin-section">
+      <div class="coin-card">
+        <div class="coin-card-title">
+          <span>🔥 Check-in Harian</span>
+          <span class="coin-streak-badge" id="coinStreakBadge">Hari ke-1</span>
+        </div>
+        <div class="coin-streak-grid" id="coinStreakGrid"></div>
+        <button class="coin-claim-btn" id="coinClaimBtn" onclick="claimDailyCoin()">Klaim Hadiah Hari Ini</button>
+      </div>
+
+      <div class="coin-card coin-egg-card">
+        <div class="coin-card-title"><span>🥚 Telur Emas Harian</span></div>
+        <p class="coin-egg-desc">Ketuk telurnya buat buka hadiah kejutan — reset tiap hari!</p>
+        <div class="coin-egg-wrap">
+          <div class="coin-egg" id="coinEgg" onclick="openGoldenEgg()">
+            <div class="coin-egg-shine"></div>
+            <span id="coinEggEmoji">🥚</span>
+          </div>
+          <div class="coin-egg-reward" id="coinEggReward" style="display:none"></div>
+        </div>
+        <p class="coin-egg-status" id="coinEggStatus"></p>
+      </div>
     </div>
   </section>
 

@@ -199,6 +199,20 @@ body {
   animation: loaderMarkBeat 1.8s ease-in-out infinite;
 }
 
+/* Functional circular progress ring — mengisi sesuai persentase loading */
+.loader-progress-ring {
+  --pct: 1;
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  z-index: 2;
+  background: conic-gradient(var(--primary) calc(var(--pct) * 1%), rgba(255,255,255,.1) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  transition: background .15s linear;
+  filter: drop-shadow(0 0 6px rgba(255,122,61,.5));
+}
+
 @keyframes loaderMarkBeat {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
@@ -2659,12 +2673,10 @@ footer {
 .receipt-grand-total-box span:first-child { font-size: .78rem; color: rgba(255,255,255,.6); font-weight: 600; }
 .receipt-grand-total-box span:last-child {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  background: linear-gradient(90deg, #FF8A5C, #FFC97A);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #FFC97A;
+  letter-spacing: -0.01em;
 }
 
 .receipt-footer-note {

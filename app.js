@@ -1887,16 +1887,19 @@ function handleNewsletterSubmit(form) {
 
 // ===== PAGE LOADER =====
 (function () {
-  // Tampilkan intro 10 detik penuh hanya di kunjungan PERTAMA tiap sesi browser.
+  // Tampilkan intro 6 detik penuh & konsisten hanya di kunjungan PERTAMA tiap sesi browser.
   // Reload/navigasi berikutnya dalam sesi yang sama akan lebih cepat (UX lebih baik).
   const seenThisSession = sessionStorage.getItem("rky_loader_seen") === "1";
-  const MIN_DISPLAY_MS = seenThisSession ? 600 : 2800;
-  const FALLBACK_MS = seenThisSession ? 2200 : 5000;
+  const MIN_DISPLAY_MS = seenThisSession ? 600 : 6000;
+  const FALLBACK_MS = seenThisSession ? 2200 : 9000;
   const shownAt = Date.now();
   let hidden = false;
+  let animDone = false;   // animasi hitung 1% -> 100% sudah selesai penuh?
+  let contentReady = false; // halaman (window load / fallback) sudah siap?
 
   const percentEl = document.getElementById("loaderPercent");
   const textEl = document.getElementById("loaderText");
+  const ringEl = document.getElementById("loaderProgressRing");
   const tips = [
     "Menyiapkan pengalaman belanja terbaikmu...",
     "Mengecek stok produk favorit...",
@@ -1907,41 +1910,54 @@ function handleNewsletterSubmit(form) {
   ];
   let tipIndex = 0;
   let tipTimer = null;
-  let percentTimer = null;
 
-  if (percentEl && textEl) {
+  if (textEl) {
     tipTimer = setInterval(() => {
       tipIndex = (tipIndex + 1) % tips.length;
       textEl.style.opacity = 0;
       setTimeout(() => { textEl.textContent = tips[tipIndex]; textEl.style.opacity = 1; }, 250);
     }, Math.max(1200, MIN_DISPLAY_MS / tips.length));
-
-    percentTimer = setInterval(() => {
-      const elapsed = Date.now() - shownAt;
-      const pct = Math.min(99, Math.round((elapsed / MIN_DISPLAY_MS) * 100));
-      percentEl.textContent = pct + "%";
-    }, 80);
   }
 
-  function hideLoader() {
+  // Animasi persen berjalan MANDIRI dari kondisi jaringan/gambar — SELALU
+  // menempuh durasi penuh MIN_DISPLAY_MS dari 1% ke 100%, tidak pernah "meloncat".
+  function tickPercent() {
+    const elapsed = Date.now() - shownAt;
+    const t = Math.min(1, elapsed / MIN_DISPLAY_MS);
+    const eased = 1 - Math.pow(1 - t, 2); // ease-out
+    const pct = Math.min(100, Math.max(1, Math.round(eased * 100)));
+    if (percentEl) percentEl.textContent = pct + "%";
+    if (ringEl) ringEl.style.setProperty("--pct", pct);
+
+    if (t >= 1) {
+      animDone = true;
+      maybeHide();
+      return;
+    }
+    requestAnimationFrame(tickPercent);
+  }
+  requestAnimationFrame(tickPercent);
+
+  function maybeHide() {
     if (hidden) return;
+    if (!animDone || !contentReady) return; // tunggu KEDUA syarat: animasi penuh + konten siap
     hidden = true;
     if (tipTimer) clearInterval(tipTimer);
-    if (percentTimer) clearInterval(percentTimer);
-    if (percentEl) percentEl.textContent = "100%";
     const loader = document.getElementById("pageLoader");
     if (!loader) return;
-    const elapsed = Date.now() - shownAt;
-    const wait = Math.max(0, MIN_DISPLAY_MS - elapsed);
-    setTimeout(() => {
-      loader.classList.add("loader-hide");
-      setTimeout(() => loader.remove(), 550);
-      sessionStorage.setItem("rky_loader_seen", "1");
-    }, wait);
+    loader.classList.add("loader-hide");
+    setTimeout(() => loader.remove(), 550);
+    sessionStorage.setItem("rky_loader_seen", "1");
   }
 
-  window.addEventListener("load", hideLoader);
-  setTimeout(hideLoader, FALLBACK_MS);
+  function markContentReady() {
+    if (contentReady) return;
+    contentReady = true;
+    maybeHide();
+  }
+
+  window.addEventListener("load", markContentReady);
+  setTimeout(markContentReady, FALLBACK_MS);
 })();
 // =====================================================================
 // ===== KOIN SAYA — daily check-in streak + golden egg (gamifikasi)
