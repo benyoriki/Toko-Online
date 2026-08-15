@@ -114,36 +114,40 @@
       <div class="co-form-grid">
         <div class="co-input-group">
           <label>Nama Lengkap *</label>
-          <input type="text" id="co_name" placeholder="Nama penerima paket" />
+          <div class="input-check-wrap"><input type="text" id="co_name" data-validate="name" placeholder="Nama penerima paket" /><span class="input-check-icon"></span></div>
+          <span class="input-error-msg"></span>
         </div>
         <div class="co-input-group">
           <label>Email *</label>
-          <input type="email" id="co_email" placeholder="email@kamu.com" />
+          <div class="input-check-wrap"><input type="email" id="co_email" data-validate="email" placeholder="email@kamu.com" /><span class="input-check-icon"></span></div>
+          <span class="input-error-msg"></span>
         </div>
         <div class="co-input-group">
           <label>Nomor HP / WA *</label>
-          <input type="tel" id="co_phone" placeholder="08xxxxxxxxxx" />
+          <div class="input-check-wrap"><input type="tel" id="co_phone" data-validate="phone" placeholder="08xxxxxxxxxx" /><span class="input-check-icon"></span></div>
+          <span class="input-error-msg"></span>
         </div>
         <div class="co-input-group co-full">
           <label>Alamat Lengkap *</label>
-          <textarea id="co_address" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..." rows="3"></textarea>
+          <div class="input-check-wrap"><textarea id="co_address" data-validate="address" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..." rows="3"></textarea><span class="input-check-icon"></span></div>
+          <span class="input-error-msg"></span>
         </div>
         <div class="co-input-group">
           <label>Kota / Kabupaten *</label>
-          <input type="text" id="co_city" placeholder="Contoh: Depok" />
+          <div class="input-check-wrap"><input type="text" id="co_city" data-validate="required" placeholder="Contoh: Depok" /><span class="input-check-icon"></span></div>
         </div>
         <div class="co-input-group">
           <label>Provinsi *</label>
-          <input type="text" id="co_province" placeholder="Contoh: Jawa Barat" />
+          <div class="input-check-wrap"><input type="text" id="co_province" data-validate="required" placeholder="Contoh: Jawa Barat" /><span class="input-check-icon"></span></div>
         </div>
         <div class="co-input-group">
           <label>Kode Pos *</label>
-          <input type="text" id="co_postal" placeholder="Contoh: 16412" />
+          <div class="input-check-wrap"><input type="text" id="co_postal" data-validate="postal" placeholder="Contoh: 16412" /><span class="input-check-icon"></span></div>
         </div>
       </div>
       <div class="co-summary-mini">
         <h4>🛒 Ringkasan Pesanan</h4>
-        <div id="coSummaryItems"></div>
+        <div id="coSummaryItemsMini"></div>
       </div>
       <div class="co-step-actions">
         <button onclick="closeCheckoutModal()" class="btn-co-back">✕ Batal</button>
@@ -155,7 +159,7 @@
     <div id="co-step-2" class="checkout-step-panel">
       <h3 class="co-step-title">🚚 Pilih Jasa Kurir</h3>
       <div id="courierList" class="courier-list"></div>
-      <div id="coTotalDisplay" class="co-total-display"></div>
+      <div id="coTotalDisplayStep2" class="co-total-display"></div>
       <div class="co-step-actions">
         <button onclick="showCheckoutStep(1)" class="btn-co-back">← Kembali</button>
         <button onclick="goToStep3()" class="btn-co-next">Review Pesanan →</button>
@@ -436,27 +440,29 @@
     <div class="search-bar-wrap">
       <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Cari produk, brand, kategori..." oninput="handleSearch()" autocomplete="off" />
-        <button class="search-btn">🔍</button>
+        <button class="search-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
       </div>
       <div class="search-suggest" id="searchSuggest"></div>
     </div>
 
     <div class="header-actions">
       <button id="accountBtn" class="icon-btn account-btn" onclick="handleAccountClick()" title="Akun Saya">
-        <span id="accountBtnIcon">👤</span> <span class="icon-label" id="accountBtnLabel">Akun</span>
+        <span id="accountBtnIcon" class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> <span class="icon-label" id="accountBtnLabel">Akun</span>
       </button>
       <button class="icon-btn track-btn" onclick="openTrackingModal()" title="Lacak Paket">
-        🔍 <span class="icon-label">Lacak</span>
+        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="11" rx="1.5"/><path d="M16 10h3.5l3.5 3.5V18h-7z"/><circle cx="6" cy="19.5" r="1.6"/><circle cx="18" cy="19.5" r="1.6"/></svg></span> <span class="icon-label">Lacak</span>
       </button>
       <button class="icon-btn orders-btn" onclick="openMyOrders()" title="Pesanan Saya">
-        📦 <span class="icon-label">Pesanan</span>
+        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span> <span class="icon-label">Pesanan</span>
       </button>
       <button class="icon-btn cart-btn" onclick="openCart()">
-        🛒 <span id="cartBadge" class="badge">0</span>
+        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/><path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.6a2 2 0 002-1.6L21 8H6"/></svg></span> <span id="cartBadge" class="badge">0</span>
       </button>
-      <button class="icon-btn wishlist-btn" onclick="showPage('wishlist')">❤️ <span id="wishBadge" class="badge">0</span></button>
+      <button class="icon-btn wishlist-btn" onclick="showPage('wishlist')">
+        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg></span> <span id="wishBadge" class="badge">0</span>
+      </button>
       <button id="adminToggle" class="btn-admin admin-hidden-btn" onclick="handleAdminClick()">
-        ⚙️ Admin
+        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Admin
         <span id="adminNotifBadge" class="admin-notif-badge" style="display:none">0</span>
       </button>
       <button id="hamburgerBtn" class="hamburger-btn" onclick="openMobileDrawer()" title="Menu">
@@ -507,7 +513,7 @@
       <span class="drawer-item-arrow">›</span>
     </button>
     <button class="drawer-item" onclick="closeMobileDrawer(); openTrackingModal();">
-      <span class="drawer-item-icon di-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <span class="drawer-item-icon di-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="11" rx="1.5"/><path d="M16 10h3.5l3.5 3.5V18h-7z"/><circle cx="6" cy="19.5" r="1.6"/><circle cx="18" cy="19.5" r="1.6"/></svg></span>
       <span class="drawer-item-text">Lacak Paket</span>
       <span class="drawer-item-arrow">›</span>
     </button>
@@ -544,19 +550,19 @@
 <!-- BOTTOM NAVIGATION (mobile only) -->
 <nav id="bottomNav" class="bottom-nav">
   <button class="bn-item active" data-bn="shop" onclick="bnGoHome()">
-    <span class="bn-icon">🏠</span><span class="bn-label">Beranda</span>
+    <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span><span class="bn-label">Beranda</span>
   </button>
   <button class="bn-item" onclick="bnGoCategories()">
-    <span class="bn-icon">🗂️</span><span class="bn-label">Kategori</span>
+    <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span class="bn-label">Kategori</span>
   </button>
-  <button class="bn-item" onclick="openCart()">
-    <span class="bn-icon">🛒<span id="cartBadgeBottom" class="bn-badge">0</span></span><span class="bn-label">Keranjang</span>
+  <button class="bn-item bn-fab" onclick="openCart()">
+    <span class="bn-fab-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/><path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.6a2 2 0 002-1.6L21 8H6"/></svg><span id="cartBadgeBottom" class="bn-badge">0</span></span><span class="bn-label">Keranjang</span>
   </button>
   <button class="bn-item" data-bn="wishlist" onclick="showPage('wishlist')">
-    <span class="bn-icon">❤️<span id="wishBadgeBottom" class="bn-badge">0</span></span><span class="bn-label">Wishlist</span>
+    <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg><span id="wishBadgeBottom" class="bn-badge">0</span></span><span class="bn-label">Wishlist</span>
   </button>
   <button class="bn-item" onclick="handleAccountClick()">
-    <span class="bn-icon" id="bnAccountIcon">👤</span><span class="bn-label" id="bnAccountLabel">Akun</span>
+    <span class="bn-icon" id="bnAccountIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bn-label" id="bnAccountLabel">Akun</span>
   </button>
 </nav>
 
@@ -607,8 +613,8 @@
     <div class="stats-bar">
       <div class="stat-item"><span class="stat-icon">📦</span><div><strong id="statProducts">0</strong><small>Produk</small></div></div>
       <div class="stat-item"><span class="stat-icon">⭐</span><div><strong><span data-count-to="4.9" data-count-decimals="1">0</span></strong><small>Rating</small></div></div>
-      <div class="stat-item"><span class="stat-icon">🚚</span><div><strong><span data-count-to="6" data-count-decimals="0">0</span> Kurir</strong><small>Tersedia</small></div></div>
-      <div class="stat-item"><span class="stat-icon">🔄</span><div><strong><span data-count-to="30" data-count-decimals="0">0</span> Hari</strong><small>Return</small></div></div>
+      <div class="stat-item"><span class="stat-icon">🚚</span><div><strong><span data-count-to="6" data-count-decimals="0">0</span></strong><small>Kurir Tersedia</small></div></div>
+      <div class="stat-item"><span class="stat-icon">🔄</span><div><strong><span data-count-to="30" data-count-decimals="0">0</span></strong><small>Hari Return</small></div></div>
     </div>
 
     <!-- AI PROMO BANNER -->
@@ -651,6 +657,14 @@
       <span class="coin-promo-cta">Klaim →</span>
     </div>
 
+    <!-- RECENTLY VIEWED -->
+    <section id="recentlyViewedSection" style="display:none">
+      <div class="section-header">
+        <div class="section-title"><span class="flash-icon">🕐</span><h3>Baru Dilihat</h3></div>
+      </div>
+      <div id="recentlyViewedList" class="product-grid horizontal-scroll"></div>
+    </section>
+
     <!-- FLASH SALE SECTION -->
     <div class="section-header">
       <div class="section-title">
@@ -663,6 +677,25 @@
     <div id="flashSaleList" class="product-grid"></div>
 
     <!-- ALL PRODUCTS -->
+    <div id="categoryBanner" class="category-banner" style="display:none">
+      <span class="category-banner-icon" id="categoryBannerIcon">📦</span>
+      <div>
+        <h3 id="categoryBannerTitle">Kategori</h3>
+        <p id="categoryBannerDesc"><span id="categoryBannerCount">0</span> produk tersedia</p>
+      </div>
+    </div>
+    <div class="filter-chip-bar" id="filterChipBar">
+      <button class="filter-chip" data-filter="price" data-val="all" onclick="setPriceRange('all', this)">Semua Harga</button>
+      <button class="filter-chip" data-filter="price" data-val="0-100000" onclick="setPriceRange('0-100000', this)">&lt; 100rb</button>
+      <button class="filter-chip" data-filter="price" data-val="100000-1000000" onclick="setPriceRange('100000-1000000', this)">100rb - 1jt</button>
+      <button class="filter-chip" data-filter="price" data-val="1000000-5000000" onclick="setPriceRange('1000000-5000000', this)">1jt - 5jt</button>
+      <button class="filter-chip" data-filter="price" data-val="5000000-999999999" onclick="setPriceRange('5000000-999999999', this)">&gt; 5jt</button>
+      <span class="filter-chip-divider"></span>
+      <button class="filter-chip" data-filter="rating" data-val="4" onclick="setMinRating(4, this)">⭐ 4.0+</button>
+      <button class="filter-chip" data-filter="rating" data-val="4.5" onclick="setMinRating(4.5, this)">⭐ 4.5+</button>
+      <span class="filter-chip-divider"></span>
+      <button class="filter-chip" id="flashOnlyChip" onclick="toggleFlashOnly(this)">⚡ Flash Sale Saja</button>
+    </div>
     <div class="section-header">
       <div class="section-title"><h3>🛍️ Semua Produk</h3></div>
       <div class="sort-control" id="sortControl">

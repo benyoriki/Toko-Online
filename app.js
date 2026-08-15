@@ -11,6 +11,11 @@ let currentUserId = localStorage.getItem("rky_current_user") || null;
 let isAdmin = false;
 let currentCategory = "all";
 let currentSort = "default";
+let currentPriceRange = "all";
+let currentMinRating = 0;
+let currentFlashOnly = false;
+let recentlyViewed = JSON.parse(localStorage.getItem("rky_recent_viewed")) || [];
+let recentSearches = JSON.parse(localStorage.getItem("rky_recent_searches")) || [];
 let editingIndex = -1;
 let chatHistory = [];
 let heroSlideIndex = 0;
@@ -311,6 +316,12 @@ function getFilteredProducts() {
   if (q) list = list.filter(p =>
     p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || (p.desc || "").toLowerCase().includes(q)
   );
+  if (currentPriceRange !== "all") {
+    const [min, max] = currentPriceRange.split("-").map(Number);
+    list = list.filter(p => p.price >= min && p.price <= max);
+  }
+  if (currentMinRating > 0) list = list.filter(p => (p.rating || 0) >= currentMinRating);
+  if (currentFlashOnly) list = list.filter(p => p.flash);
   switch (currentSort) {
     case "price-asc": list.sort((a, b) => a.price - b.price); break;
     case "price-desc": list.sort((a, b) => b.price - a.price); break;
@@ -320,11 +331,54 @@ function getFilteredProducts() {
   return list;
 }
 
+function setPriceRange(val, btn) {
+  currentPriceRange = val;
+  document.querySelectorAll('.filter-chip[data-filter="price"]').forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderShop();
+}
+
+function setMinRating(val, btn) {
+  currentMinRating = currentMinRating === val ? 0 : val;
+  document.querySelectorAll('.filter-chip[data-filter="rating"]').forEach(b => b.classList.toggle("active", b === btn && currentMinRating > 0));
+  renderShop();
+}
+
+function toggleFlashOnly(btn) {
+  currentFlashOnly = !currentFlashOnly;
+  btn.classList.toggle("active", currentFlashOnly);
+  renderShop();
+}
+
+const CATEGORY_META = {
+  elektronik: { icon: "📱", name: "Elektronik", desc: "Gadget & perangkat elektronik terbaru" },
+  fashion: { icon: "👗", name: "Fashion", desc: "Pakaian & aksesori kekinian" },
+  makanan: { icon: "🍔", name: "Makanan", desc: "Kuliner favorit siap kirim" },
+  kecantikan: { icon: "💄", name: "Kecantikan", desc: "Perawatan & kecantikan pilihan" },
+  olahraga: { icon: "⚽", name: "Olahraga", desc: "Perlengkapan olahraga & fitness" },
+  rumah: { icon: "🏠", name: "Rumah", desc: "Kebutuhan rumah tangga" },
+  hewan: { icon: "🐾", name: "Hewan", desc: "Kebutuhan hewan peliharaan" },
+  otomotif: { icon: "🚗", name: "Otomotif", desc: "Aksesori & perlengkapan kendaraan" },
+};
+
+function updateCategoryBanner() {
+  const banner = document.getElementById("categoryBanner");
+  if (!banner) return;
+  if (currentCategory === "all") { banner.style.display = "none"; return; }
+  const meta = CATEGORY_META[currentCategory] || { icon: "📦", name: currentCategory, desc: "" };
+  const count = products.filter(p => p.category === currentCategory).length;
+  document.getElementById("categoryBannerIcon").textContent = meta.icon;
+  document.getElementById("categoryBannerTitle").textContent = meta.name;
+  document.getElementById("categoryBannerDesc").innerHTML = `<span id="categoryBannerCount">${count}</span> produk tersedia — ${meta.desc}`;
+  banner.style.display = "flex";
+}
+
 function filterCategory(cat, btn) {
   currentCategory = cat;
   document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
   showPage("shop");
+  updateCategoryBanner();
   renderShop();
 }
 
@@ -352,7 +406,10 @@ document.addEventListener("click", (e) => {
   const ctrl = document.getElementById("sortControl");
   if (ctrl && !ctrl.contains(e.target)) closeSortMenu();
 });
-function handleSearch() { renderShop(); renderSearchSuggest(); }
+function handleSearch() {
+  renderShop();
+  renderSearchSuggest();
+}
 
 // ===== WISHLIST =====
 function toggleWishlist(e, id) {
@@ -367,9 +424,18 @@ function toggleWishlist(e, id) {
 }
 
 function updateWishBadge() {
-  document.getElementById("wishBadge").textContent = wishlist.length;
+  const badge = document.getElementById("wishBadge");
+  badge.textContent = wishlist.length;
+  badge.classList.remove("badge-bump");
+  void badge.offsetWidth;
+  badge.classList.add("badge-bump");
   const b = document.getElementById("wishBadgeBottom");
-  if (b) b.textContent = wishlist.length;
+  if (b) {
+    b.textContent = wishlist.length;
+    b.classList.remove("badge-bump");
+    void b.offsetWidth;
+    b.classList.add("badge-bump");
+  }
 }
 
 function renderWishlist() {
@@ -530,6 +596,8 @@ function renderCheckoutSummary() {
     </div>`;
   }).join("");
   document.getElementById("coSummaryItems").innerHTML = html;
+  const mini = document.getElementById("coSummaryItemsMini");
+  if (mini) mini.innerHTML = html;
   window._coSubtotal = total;
   updateCoTotal();
 }
@@ -554,11 +622,16 @@ function goToStep2() {
   const province = document.getElementById("co_province").value.trim();
   const postal = document.getElementById("co_postal").value.trim();
 
-  if (!name || !email || !phone || !address || !city || !province || !postal) {
-    showToast("Harap lengkapi semua data alamat!", "⚠️"); return;
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showToast("Format email tidak valid!", "⚠️"); return;
+  const fields = document.querySelectorAll("#co-step-1 [data-validate], #co-step-1 #co_city, #co-step-1 #co_province");
+  let allValid = true;
+  document.querySelectorAll("#co-step-1 [data-validate]").forEach(el => { if (!validateField(el)) allValid = false; });
+  if (!city) { document.getElementById("co_city").closest(".input-check-wrap")?.classList.add("invalid"); allValid = false; }
+  if (!province) { document.getElementById("co_province").closest(".input-check-wrap")?.classList.add("invalid"); allValid = false; }
+
+  if (!allValid) {
+    showToast("Periksa kembali data yang belum sesuai (tanda ✕ merah)", "⚠️");
+    document.querySelector("#co-step-1 .invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
   }
   // Save buyer profile
   buyerProfile = { name, email, phone, address, city, province, postal };
@@ -592,14 +665,15 @@ function updateCoTotal() {
   const courier = COURIERS.find(c => c.id === selectedCourier);
   const ongkir = courier ? courier.price : 0;
   const total = (window._coSubtotal || 0) + ongkir;
-  const el = document.getElementById("coTotalDisplay");
-  if (el) {
-    el.innerHTML = `
+  const totalHtml = `
       <div class="co-total-row"><span>Subtotal</span><span>${formatRp(window._coSubtotal || 0)}</span></div>
       <div class="co-total-row"><span>Ongkir (${courier ? courier.name : "-"})</span><span>${courier ? formatRp(courier.price) : "-"}</span></div>
       <div class="co-total-row grand"><span>Total</span><span>${formatRp(total)}</span></div>
     `;
-  }
+  const el = document.getElementById("coTotalDisplay");
+  if (el) el.innerHTML = totalHtml;
+  const elStep2 = document.getElementById("coTotalDisplayStep2");
+  if (elStep2) elStep2.innerHTML = totalHtml;
   window._coTotal = total;
   window._coOngkir = ongkir;
 }
@@ -925,16 +999,21 @@ function openModal(idx) {
   const p = products[idx];
   if (!p) return;
   const disc = discountPct(p.price, p.origPrice);
+  const viewerCount = getFakeViewerCount(p.id);
+  const variantsHtml = renderVariantOptions(p);
+  const reviewsHtml = renderDummyReviews(p);
   document.getElementById("modalContent").innerHTML = `
     <img class="modal-product-img" src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/520x280/f1f5f9/94a3b8?text=No+Image'" />
     <div class="modal-product-body">
       <div class="modal-product-cat">📂 ${p.category} ${p.flash ? "• ⚡ Flash Sale" : ""}</div>
       <h2>${p.name}</h2>
       <div class="modal-product-rating">${renderStars(p.rating)} ${p.rating} · ${(p.sold||0).toLocaleString("id-ID")} terjual</div>
+      <div class="modal-viewer-badge">🔥 <strong>${viewerCount} orang</strong> sedang melihat produk ini</div>
       <div class="modal-product-price">${formatRp(p.price)} ${disc > 0 ? `<span style="background:#fee2e2;color:#E11D48;padding:3px 8px;border-radius:6px;font-size:.75rem;font-weight:700;margin-left:6px;">-${disc}%</span>` : ""}</div>
       ${p.origPrice ? `<div class="modal-orig-price">${formatRp(p.origPrice)}</div>` : ""}
       <div class="modal-stock">📦 Stok: <strong>${p.stock} tersedia</strong></div>
       <div class="modal-product-desc">${p.desc || "Produk berkualitas tinggi."}</div>
+      ${variantsHtml}
       <div class="modal-qty-row">
         <label>Jumlah:</label>
         <div class="modal-qty-ctrl">
@@ -947,12 +1026,125 @@ function openModal(idx) {
         <button class="modal-btn-cart" onclick="modalAddCart(${p.id})" ${p.stock<=0?"disabled":""}>🛒 Keranjang</button>
         <button class="modal-btn-buy" onclick="modalBuyNow(${p.id})" ${p.stock<=0?"disabled":""}>⚡ Beli Sekarang</button>
       </div>
+      ${reviewsHtml}
     </div>
   `;
   window._modalProductId = p.id;
   window._modalQty = 1;
   window._modalMaxQty = p.stock;
   document.getElementById("productModal").classList.add("open");
+  trackRecentlyViewed(p.id);
+}
+
+// ===== SOCIAL PROOF (simulasi, deterministik per produk + waktu) =====
+function getFakeViewerCount(id) {
+  const minuteBucket = Math.floor(Date.now() / 60000);
+  const seed = (id * 9301 + minuteBucket * 49297) % 233280;
+  return 3 + Math.floor((seed / 233280) * 27); // 3-29 orang
+}
+
+const FAKE_BUYER_NAMES = ["Andi", "Siti", "Budi", "Rina", "Dedi", "Putri", "Agus", "Wulan", "Fajar", "Lestari"];
+const FAKE_CITIES = ["Jakarta", "Bandung", "Surabaya", "Bogor", "Medan", "Makassar", "Semarang", "Bekasi", "Depok", "Yogyakarta"];
+
+function startSocialProofToasts() {
+  if (window._socialProofTimer) return;
+  const show = () => {
+    if (document.hidden || products.length === 0) return;
+    const p = products[Math.floor(Math.random() * products.length)];
+    const name = FAKE_BUYER_NAMES[Math.floor(Math.random() * FAKE_BUYER_NAMES.length)];
+    const city = FAKE_CITIES[Math.floor(Math.random() * FAKE_CITIES.length)];
+    showSocialProofToast(`${name} dari ${city} baru saja membeli`, p.name, p.image);
+  };
+  setTimeout(show, 8000);
+  window._socialProofTimer = setInterval(show, 22000);
+}
+
+function showSocialProofToast(line1, line2, img) {
+  let el = document.getElementById("socialProofToast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "socialProofToast";
+    el.className = "social-proof-toast";
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <img src="${img}" onerror="this.style.display='none'" />
+    <div><div class="spt-line1">${line1}</div><div class="spt-line2">${line2}</div></div>
+    <button class="spt-close" onclick="document.getElementById('socialProofToast').classList.remove('show')">✕</button>
+  `;
+  requestAnimationFrame(() => el.classList.add("show"));
+  clearTimeout(window._socialProofHideTimer);
+  window._socialProofHideTimer = setTimeout(() => el.classList.remove("show"), 5000);
+}
+
+// ===== PRODUCT VARIANTS (demo) =====
+const VARIANT_MAP = {
+  fashion: { label: "Ukuran", options: ["S", "M", "L", "XL"] },
+  elektronik: { label: "Warna", options: ["Hitam", "Putih", "Silver"] },
+  olahraga: { label: "Ukuran", options: ["S", "M", "L", "XL"] },
+  otomotif: { label: "Warna", options: ["Hitam", "Merah", "Biru"] },
+};
+
+function renderVariantOptions(p) {
+  const v = VARIANT_MAP[p.category];
+  if (!v) return "";
+  return `
+    <div class="modal-variant-group">
+      <label>${v.label}:</label>
+      <div class="modal-variant-chips">
+        ${v.options.map((opt, i) => `<button type="button" class="variant-chip ${i === 0 ? "active" : ""}" onclick="selectVariant(this)">${opt}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+function selectVariant(btn) {
+  btn.parentElement.querySelectorAll(".variant-chip").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+// ===== DUMMY REVIEWS (UGC) =====
+const REVIEW_POOL = [
+  { name: "Andi P.", text: "Barangnya sesuai deskripsi, pengiriman cepat banget!", rating: 5, hasPhoto: true },
+  { name: "Siti R.", text: "Kualitas oke buat harga segini, recommended.", rating: 4, hasPhoto: false },
+  { name: "Budi S.", text: "Packing rapi, respon seller juga cepat. Puas!", rating: 5, hasPhoto: true },
+];
+
+function renderDummyReviews(p) {
+  if (!p.rating) return "";
+  return `
+    <div class="modal-reviews">
+      <div class="modal-reviews-title">💬 Ulasan Pembeli</div>
+      ${REVIEW_POOL.map(r => `
+        <div class="review-item">
+          <div class="review-avatar">${r.name.charAt(0)}</div>
+          <div class="review-body">
+            <div class="review-top"><strong>${r.name}</strong><span class="review-stars">${renderStars(r.rating)}</span></div>
+            <p>${r.text}</p>
+            ${r.hasPhoto ? `<div class="review-photo-strip"><span class="review-photo-thumb"></span><span class="review-photo-thumb"></span></div>` : ""}
+          </div>
+        </div>
+      `).join("")}
+    </div>`;
+}
+
+// ===== RECENTLY VIEWED =====
+function trackRecentlyViewed(id) {
+  recentlyViewed = recentlyViewed.filter(x => x !== id);
+  recentlyViewed.unshift(id);
+  recentlyViewed = recentlyViewed.slice(0, 10);
+  localStorage.setItem("rky_recent_viewed", JSON.stringify(recentlyViewed));
+  renderRecentlyViewed();
+}
+
+function renderRecentlyViewed() {
+  const section = document.getElementById("recentlyViewedSection");
+  const list = document.getElementById("recentlyViewedList");
+  if (!section || !list) return;
+  const items = recentlyViewed.map(id => products.find(p => p.id === id)).filter(Boolean);
+  if (items.length === 0) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  list.innerHTML = items.map(p => renderCard(p, products.indexOf(p))).join("");
+  initCardCarouselHover();
 }
 
 function modalQty(delta) {
@@ -1325,7 +1517,6 @@ function updateDashboard() {
   document.getElementById("dashOrders").textContent = orders.length;
   const revenue = orders.reduce((sum, o) => sum + o.total, 0);
   document.getElementById("dashRevenue").textContent = formatRp(revenue);
-  document.getElementById("dashVisitors").textContent = Math.floor(Math.random() * 900 + 100).toLocaleString("id-ID");
 
   const pendingOrders = orders.filter(o => o.status !== "Paket Tiba").length;
   const pendingEl = document.getElementById("dashPending");
@@ -1789,8 +1980,9 @@ window.addEventListener("DOMContentLoaded", () => {
   initSearchSuggest();
   initCardTilt();
   initCoinSystem();
-
-  // Inject payment methods
+  renderRecentlyViewed();
+  startSocialProofToasts();
+  initCheckoutValidation();
   const pmContainer = document.getElementById("paymentMethodsList");
   if (pmContainer) pmContainer.innerHTML = renderPaymentMethods();
 
@@ -1846,17 +2038,36 @@ function initSearchSuggest() {
   const box = document.getElementById("searchSuggest");
   if (!input || !box) return;
   input.addEventListener("focus", () => renderSearchSuggest());
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && input.value.trim()) {
+      saveRecentSearch(input.value.trim());
+      box.classList.remove("show");
+    }
+  });
   document.addEventListener("click", (e) => {
     if (!box.contains(e.target) && e.target !== input) box.classList.remove("show");
   });
 }
+
+const TRENDING_SEARCHES = ["iPhone", "Kursi Gaming", "Sepatu Sneakers", "Skincare", "Kaos Polos"];
 
 function renderSearchSuggest() {
   const input = document.getElementById("searchInput");
   const box = document.getElementById("searchSuggest");
   if (!input || !box) return;
   const q = input.value.trim().toLowerCase();
-  if (!q) { box.classList.remove("show"); return; }
+  if (!q) {
+    const chips = [];
+    if (recentSearches.length) {
+      chips.push(`<div class="search-suggest-label">Pencarian Terakhir</div>`);
+      chips.push(`<div class="search-chip-row">${recentSearches.slice(0, 6).map(t => `<button class="search-chip" onclick="applySearchTerm('${t.replace(/'/g, "\\'")}')">🕐 ${t}</button>`).join("")}</div>`);
+    }
+    chips.push(`<div class="search-suggest-label">Pencarian Populer</div>`);
+    chips.push(`<div class="search-chip-row">${TRENDING_SEARCHES.map(t => `<button class="search-chip" onclick="applySearchTerm('${t}')">🔥 ${t}</button>`).join("")}</div>`);
+    box.innerHTML = chips.join("");
+    box.classList.add("show");
+    return;
+  }
   const matches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 6);
   if (matches.length === 0) {
     box.innerHTML = `<div class="search-suggest-empty">Tidak ada produk cocok dengan "${q}"</div>`;
@@ -1870,6 +2081,24 @@ function renderSearchSuggest() {
     `).join("");
   }
   box.classList.add("show");
+}
+
+function applySearchTerm(term) {
+  const input = document.getElementById("searchInput");
+  input.value = term;
+  saveRecentSearch(term);
+  handleSearch();
+  document.getElementById("searchSuggest").classList.remove("show");
+  document.getElementById("productList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function saveRecentSearch(term) {
+  term = term.trim();
+  if (!term) return;
+  recentSearches = recentSearches.filter(t => t.toLowerCase() !== term.toLowerCase());
+  recentSearches.unshift(term);
+  recentSearches = recentSearches.slice(0, 8);
+  localStorage.setItem("rky_recent_searches", JSON.stringify(recentSearches));
 }
 
 function selectSearchSuggest(id) {
@@ -2127,4 +2356,37 @@ function updateCoinBalanceBump() {
   el.classList.remove("badge-bump");
   void el.offsetWidth;
   el.classList.add("badge-bump");
+}
+
+// ===== CHECKOUT REAL-TIME VALIDATION =====
+function validateField(el) {
+  const type = el.dataset.validate;
+  const val = el.value.trim();
+  let ok = true, msg = "";
+  if (!type) return true;
+  if (val === "") { ok = false; msg = "Wajib diisi"; }
+  else if (type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) { ok = false; msg = "Format email tidak valid"; }
+  else if (type === "phone" && !/^(08|\+628)\d{8,12}$/.test(val.replace(/[\s-]/g, ""))) { ok = false; msg = "Nomor HP tidak valid (contoh: 08123456789)"; }
+  else if (type === "name" && val.length < 3) { ok = false; msg = "Nama minimal 3 karakter"; }
+  else if (type === "address" && val.length < 10) { ok = false; msg = "Alamat terlalu singkat, lengkapi detailnya"; }
+  else if (type === "postal" && !/^\d{5}$/.test(val)) { ok = false; msg = "Kode pos harus 5 digit angka"; }
+
+  const wrap = el.closest(".input-check-wrap");
+  const group = el.closest(".co-input-group");
+  const errMsg = group ? group.querySelector(".input-error-msg") : null;
+  const icon = wrap ? wrap.querySelector(".input-check-icon") : null;
+  if (wrap) {
+    wrap.classList.toggle("valid", ok && val !== "");
+    wrap.classList.toggle("invalid", !ok);
+  }
+  if (icon) icon.textContent = val === "" ? "" : (ok ? "✓" : "✕");
+  if (errMsg) errMsg.textContent = ok ? "" : msg;
+  return ok;
+}
+
+function initCheckoutValidation() {
+  document.querySelectorAll("[data-validate]").forEach(el => {
+    el.addEventListener("input", () => validateField(el));
+    el.addEventListener("blur", () => validateField(el));
+  });
 }
