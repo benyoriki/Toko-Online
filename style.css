@@ -3987,7 +3987,7 @@ body.dark .card-img-wrap { background: linear-gradient(100deg, #1E1A2E 30%, #262
     grid-template-columns: 1.05fr 1fr;
     align-items: stretch;
   }
-  .product-card.card-wide .card-img-wrap { height: 100%; min-height: 220px; }
+  .product-card.card-wide .card-img-wrap { height: 100%; min-height: 220px; aspect-ratio: auto; width: 100%; }
   .product-card.card-wide .card-body { display: flex; flex-direction: column; justify-content: center; }
   .product-card.card-wide h4 { font-size: 1.05rem; }
 }
