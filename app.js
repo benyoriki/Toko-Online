@@ -141,6 +141,7 @@ function closeDemoNotice() {
   const el = document.getElementById("demoNotice");
   if (el) {
     el.classList.add("notice-hide");
+    document.documentElement.classList.add("no-notice");
     setTimeout(() => { el.style.display = "none"; }, 400);
   }
 }
@@ -149,6 +150,7 @@ function initDemoNotice() {
   // menyembunyikan untuk tampilan saat ini, tidak disimpan permanen.
   const el = document.getElementById("demoNotice");
   if (el) { el.classList.remove("notice-hide"); el.style.display = ""; }
+  document.documentElement.classList.remove("no-notice");
 }
 
 function initDarkMode() {
@@ -194,6 +196,7 @@ function initBackToTop() {
 
 // ===== 3D TILT ON PRODUCT CARDS (desktop / hover-capable only) =====
 function initCardTilt() {
+  return; // efek 3D dimatikan: lebih ringan untuk PC/HP lama (Windows 7)
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   document.addEventListener("mousemove", (e) => {
@@ -218,15 +221,15 @@ function renderCard(p, idx, opts = {}) {
   const isWished = wishlist.includes(p.id);
   const stockPct = Math.min(100, (p.stock / 50) * 100);
   const isLowStock = p.stock <= 5 && p.stock > 0;
-  const isBentoWide = opts.bento && opts.pos % 6 === 0;
+  const isBentoWide = false; // grid seragam (kartu lebar merusak layout di HP)
   const isAiPick = p.rating >= 4.8 && (p.sold || 0) > 150;
   // Second demo "angle" image (dummy multi-photo effect via crop params — real data will have true multi-photos)
   const img2 = p.image.includes("?") ? p.image + "&crop=entropy&fit=crop&sat=-15" : p.image + "?crop=entropy&fit=crop&sat=-15";
   return `
     <div class="product-card reveal-up ${isBentoWide ? "card-wide" : ""}" onclick="openModal(${idx})">
       <div class="card-img-wrap card-carousel" data-active="0">
-        <img class="ci-img ci-img-0 img-active" src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image'; this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" onload="this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" loading="lazy" />
-        <img class="ci-img ci-img-1" src="${img2}" alt="${p.name}" loading="lazy" />
+        <img class="ci-img ci-img-0 img-active" src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=IMG_FALLBACK; this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" onload="this.classList.add('img-loaded'); this.closest('.card-img-wrap').classList.add('img-done');" loading="lazy" decoding="async" />
+        <img class="ci-img ci-img-1" data-src="${img2}" alt="" decoding="async" />
         <div class="card-carousel-dots"><span class="ccd active"></span><span class="ccd"></span></div>
         <div class="card-quick-view"><span>👁 Lihat Detail</span></div>
         <div class="card-badges">
@@ -287,6 +290,7 @@ function initCardCarouselHover() {
     const dots = wrap.querySelectorAll(".ccd");
     wrap.addEventListener("mouseenter", () => {
       if (!img1) return;
+      if (!img1.getAttribute("src") && img1.dataset.src) img1.src = img1.dataset.src;
       img1.classList.add("img-active");
       img0.classList.remove("img-active");
       dots.forEach((d, i) => d.classList.toggle("active", i === 1));
@@ -508,7 +512,7 @@ function renderCart() {
     total += sub;
     return `
       <div class="cart-item">
-        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/60x60/f1f5f9/94a3b8?text=?'" />
+        <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=IMG_FALLBACK" />
         <div class="cart-item-info">
           <h4>${p.name}</h4>
           <div class="cart-price">${formatRp(p.price)}</div>
@@ -590,7 +594,7 @@ function renderCheckoutSummary() {
     const sub = p.price * c.qty;
     total += sub;
     return `<div class="co-summary-item">
-      <img src="${p.image}" onerror="this.src='https://placehold.co/48x48/f1f5f9/ccc?text=?'" />
+      <img src="${p.image}" onerror="this.onerror=null;this.src=IMG_FALLBACK" />
       <div><span>${p.name}</span><small>${c.qty} x ${formatRp(p.price)}</small></div>
       <strong>${formatRp(sub)}</strong>
     </div>`;
@@ -1003,7 +1007,7 @@ function openModal(idx) {
   const variantsHtml = renderVariantOptions(p);
   const reviewsHtml = renderDummyReviews(p);
   document.getElementById("modalContent").innerHTML = `
-    <img class="modal-product-img" src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/520x280/f1f5f9/94a3b8?text=No+Image'" />
+    <img class="modal-product-img" src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=IMG_FALLBACK" />
     <div class="modal-product-body">
       <div class="modal-product-cat">📂 ${p.category} ${p.flash ? "• ⚡ Flash Sale" : ""}</div>
       <h2>${p.name}</h2>
@@ -1177,20 +1181,46 @@ function closeModal(e) {
 }
 
 // ===== ADMIN =====
-function handleAdminClick() {
-  if (isAdmin) showPage("admin");
-  else document.getElementById("loginModal").classList.add("open");
+function handleAdminClick() { openAdminLogin(); }
+
+const ADMIN_DEMO = { user: "admin", pass: "6969" };
+
+function setAdminButtonState(on) {
+  const btn = document.getElementById("adminToggle");
+  const label = document.getElementById("adminBtnLabel");
+  const dl = document.getElementById("drawerAdminLabel");
+  if (label) label.textContent = on ? "Panel Admin" : "Login Admin";
+  if (dl) dl.textContent = on ? "Panel Admin" : "Login Admin";
+  if (btn) btn.classList.toggle("is-admin", on);
+}
+
+function openAdminLogin() {
+  if (isAdmin) { showPage("admin"); return; }
+  document.getElementById("loginModal").classList.add("open");
+  setTimeout(() => { const u = document.getElementById("loginUser"); if (u) u.focus(); }, 120);
+}
+
+function togglePassVisibility(btn) {
+  const inp = document.getElementById("loginPass");
+  if (!inp) return;
+  const show = inp.type === "password";
+  inp.type = show ? "text" : "password";
+  btn.textContent = show ? "Sembunyikan" : "Lihat";
+}
+
+function demoAdminLogin() {
+  document.getElementById("loginUser").value = ADMIN_DEMO.user;
+  document.getElementById("loginPass").value = ADMIN_DEMO.pass;
+  doLogin();
 }
 
 function doLogin() {
   const user = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value;
-  if (user === "admin" && pass === "6969") {
+  if (user === ADMIN_DEMO.user && pass === ADMIN_DEMO.pass) {
     isAdmin = true;
     closeLoginModal();
-    const btn = document.getElementById("adminToggle");
-    btn.textContent = "⚙️ Panel Admin";
-    btn.classList.add("admin-visible");
+    setAdminButtonState(true);
     showPage("admin");
     updateDashboard();
     renderAdminProducts();
@@ -1212,8 +1242,7 @@ function closeLoginModal(e) {
 
 function logout() {
   isAdmin = false;
-  document.getElementById("adminToggle").textContent = "⚙️ Admin";
-  document.getElementById("adminToggle").classList.remove("admin-visible");
+  setAdminButtonState(false);
   showPage("shop");
   showToast("Berhasil keluar dari panel admin", "👋");
 }
@@ -1418,7 +1447,7 @@ function renderAdminProducts(filter = "") {
     const disc = discountPct(p.price, p.origPrice);
     return `
       <div class="admin-product-row">
-        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/60x60/f1f5f9/94a3b8?text=?'" />
+        <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=IMG_FALLBACK" />
         <div class="admin-product-info">
           <h4>${p.name}</h4>
           <p>${p.category} · ${formatRp(p.price)} ${disc > 0 ? `(-${disc}%)` : ""} · Stok: ${p.stock} · Terjual: ${p.sold || 0}</p>
@@ -2114,79 +2143,196 @@ function handleNewsletterSubmit(form) {
   form.reset();
 }
 
-// ===== PAGE LOADER =====
+// ===== PAGE LOADER 2026 — 4 detik + suara sintetis (tanpa file audio, 0 KB) =====
 (function () {
-  // Tampilkan intro 6 detik penuh & konsisten hanya di kunjungan PERTAMA tiap sesi browser.
-  // Reload/navigasi berikutnya dalam sesi yang sama akan lebih cepat (UX lebih baik).
-  const seenThisSession = sessionStorage.getItem("rky_loader_seen") === "1";
-  const MIN_DISPLAY_MS = seenThisSession ? 600 : 6000;
-  const FALLBACK_MS = seenThisSession ? 2200 : 9000;
-  const shownAt = Date.now();
-  let hidden = false;
-  let animDone = false;   // animasi hitung 1% -> 100% sudah selesai penuh?
-  let contentReady = false; // halaman (window load / fallback) sudah siap?
+  const loader = document.getElementById("pageLoader");
+  if (!loader) return;
 
-  const percentEl = document.getElementById("loaderPercent");
+  const seen = sessionStorage.getItem("rky_loader_seen") === "1";
+  const forced = /[?&]intro\b/.test(location.search);
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const FULL = (!seen || forced) && !reduce;
+  const DURATION = FULL ? 4000 : 900;        // intro penuh tepat 4 detik
+  const FILL_END = FULL ? 3550 : 700;       // progres mencapai 100% lalu "klik" selesai
+  const EXIT_MS = 750;
+
+  const pctEl = document.getElementById("loaderPercent");
+  const ringEl = document.getElementById("loaderRing");
+  const barEl = document.getElementById("loaderBar");
   const textEl = document.getElementById("loaderText");
-  const ringEl = document.getElementById("loaderProgressRing");
+  const soundBtn = document.getElementById("loaderSound");
+  const soundLbl = document.getElementById("loaderSoundLabel");
+  const skipBtn = document.getElementById("loaderSkip");
+  const CIRC = 2 * Math.PI * 54;
+  if (ringEl) { ringEl.style.strokeDasharray = CIRC; ringEl.style.strokeDashoffset = CIRC; }
+
   const tips = [
-    "Menyiapkan pengalaman belanja terbaikmu...",
-    "Mengecek stok produk favorit...",
-    "Menghitung diskon flash sale...",
-    "Menyusun rekomendasi untukmu...",
-    "Menyiapkan estimasi ongkir kurir...",
-    "Hampir siap, sebentar lagi! ✨",
+    "Menyiapkan etalase terbaik untukmu…",
+    "Mengecek stok & flash sale…",
+    "Mencari harga paling hemat…",
+    "Siap belanja!"
   ];
-  let tipIndex = 0;
-  let tipTimer = null;
+  let tipIdx = -1, lastPct = -1, hidden = false, raf = 0;
+  const t0 = performance.now();
 
-  if (textEl) {
-    tipTimer = setInterval(() => {
-      tipIndex = (tipIndex + 1) % tips.length;
-      textEl.style.opacity = 0;
-      setTimeout(() => { textEl.textContent = tips[tipIndex]; textEl.style.opacity = 1; }, 250);
-    }, Math.max(1200, MIN_DISPLAY_MS / tips.length));
+  if (!FULL) {
+    loader.classList.add("pl-quick");
+    if (soundBtn) soundBtn.style.display = "none";
+    if (skipBtn) skipBtn.style.display = "none";
   }
 
-  // Animasi persen berjalan MANDIRI dari kondisi jaringan/gambar — SELALU
-  // menempuh durasi penuh MIN_DISPLAY_MS dari 1% ke 100%, tidak pernah "meloncat".
-  function tickPercent() {
-    const elapsed = Date.now() - shownAt;
-    const t = Math.min(1, elapsed / MIN_DISPLAY_MS);
-    const eased = 1 - Math.pow(1 - t, 2); // ease-out
-    const pct = Math.min(100, Math.max(1, Math.round(eased * 100)));
-    if (percentEl) percentEl.textContent = pct + "%";
-    if (ringEl) ringEl.style.setProperty("--pct", pct);
+  // ---------- SUARA (WebAudio) ----------
+  let ctx = null, master = null, started = false, muted = false;
+  try { muted = localStorage.getItem("rky_sound") === "off"; } catch (e) {}
 
-    if (t >= 1) {
-      animDone = true;
-      maybeHide();
-      return;
+  function setSoundUI(state) {
+    if (!soundBtn) return;
+    soundBtn.classList.toggle("is-off", state !== "on");
+    soundBtn.setAttribute("aria-pressed", state === "on" ? "true" : "false");
+    if (soundLbl) soundLbl.textContent = state === "on" ? "Suara aktif" : state === "blocked" ? "Ketuk untuk suara" : "Suara mati";
+  }
+
+  function tone(freq, when, dur, vol, type, detune) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine"; o.frequency.value = freq; if (detune) o.detune.value = detune;
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.exponentialRampToValueAtTime(vol, when + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+    o.connect(g); g.connect(master);
+    o.start(when); o.stop(when + dur + 0.05);
+  }
+  function bell(freq, when, vol, dur) {           // nada lonceng lembut: sinus + oktaf + harmonik
+    tone(freq, when, dur || 0.9, vol, "sine");
+    tone(freq * 2, when, (dur || 0.9) * 0.55, vol * 0.35, "triangle");
+    tone(freq * 3.01, when, (dur || 0.9) * 0.25, vol * 0.12, "sine");
+  }
+
+  // Skor 4 detik: [detik, fungsi]. 'from' = detik berjalan saat audio baru diizinkan browser.
+  function playScore(from) {
+    const now = ctx.currentTime + 0.03;
+    const at = (t) => now + Math.max(0, t - from);
+    const live = (t) => t >= from - 0.04;
+    // whoosh naik (noise terfilter)
+    if (live(0.05)) {
+      const len = Math.floor(ctx.sampleRate * 1.2), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 1.2;
+      bp.frequency.setValueAtTime(260, at(0.05)); bp.frequency.exponentialRampToValueAtTime(3200, at(1.0));
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, at(0.05));
+      g.gain.exponentialRampToValueAtTime(0.16, at(0.55)); g.gain.exponentialRampToValueAtTime(0.0001, at(1.25));
+      src.connect(bp); bp.connect(g); g.connect(master); src.start(at(0.05));
     }
-    requestAnimationFrame(tickPercent);
+    // pad hangat membesar sepanjang intro (akor C – G – E)
+    [130.81, 196.0, 329.63].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+      o.type = "triangle"; o.frequency.value = f; o.detune.value = i * 4 - 4;
+      lp.type = "lowpass"; lp.frequency.value = 900;
+      const t1 = at(Math.max(from, 0)), tEnd = at(4.35);
+      g.gain.setValueAtTime(0.0001, t1);
+      g.gain.exponentialRampToValueAtTime(0.045, at(Math.max(from, 2.6)));
+      g.gain.exponentialRampToValueAtTime(0.0001, tEnd);
+      o.connect(lp); lp.connect(g); g.connect(master); o.start(t1); o.stop(tEnd + 0.05);
+    });
+    // arpeggio pentatonik naik
+    [[0.45, 523.25], [0.80, 659.25], [1.15, 783.99], [1.50, 1046.5], [1.95, 783.99], [2.30, 1046.5]]
+      .forEach(([t, f]) => live(t) && bell(f, at(t), 0.11, 0.8));
+    // tanjakan cepat menuju klimaks
+    [[3.00, 659.25], [3.11, 783.99], [3.22, 1046.5], [3.33, 1318.5], [3.44, 1568.0]]
+      .forEach(([t, f]) => live(t) && bell(f, at(t), 0.10, 0.55));
+    // "cha-ching" + sub-bass di detik ke-4 (sinkron dengan layar terbuka)
+    if (live(3.82)) {
+      const k = ctx.createOscillator(), kg = ctx.createGain();
+      k.frequency.setValueAtTime(110, at(3.82)); k.frequency.exponentialRampToValueAtTime(42, at(4.12));
+      kg.gain.setValueAtTime(0.0001, at(3.82)); kg.gain.exponentialRampToValueAtTime(0.35, at(3.84)); kg.gain.exponentialRampToValueAtTime(0.0001, at(4.2));
+      k.connect(kg); kg.connect(master); k.start(at(3.82)); k.stop(at(4.25));
+      tone(2093.0, at(3.84), 0.75, 0.13, "sine"); tone(2637.0, at(3.90), 0.8, 0.11, "sine"); tone(3135.96, at(3.96), 0.7, 0.07, "triangle");
+    }
   }
-  requestAnimationFrame(tickPercent);
 
-  function maybeHide() {
+  function startAudio() {
+    if (!FULL || started || muted || hidden) return;
+    try {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        ctx = new AC();
+        master = ctx.createGain(); master.gain.value = 0.8;
+        const comp = ctx.createDynamicsCompressor();
+        master.connect(comp); comp.connect(ctx.destination);
+      }
+      const go = () => {
+        if (started || hidden || muted) return;
+        started = true;
+        playScore((performance.now() - t0) / 1000);
+        setSoundUI("on");
+      };
+      if (ctx.state === "running") { go(); return; }
+      const p = ctx.resume();
+      if (p && p.then) p.then(() => { if (ctx.state === "running") go(); }, () => {});
+      setTimeout(() => { if (!started && ctx.state !== "running") setSoundUI("blocked"); }, 250);
+    } catch (e) { setSoundUI("blocked"); }
+  }
+
+  function stopAudio() {
+    if (!ctx || !master) return;
+    try {
+      master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.08);
+      setTimeout(() => { try { ctx.close(); } catch (e) {} }, 900);
+    } catch (e) {}
+  }
+
+  if (FULL) {
+    setSoundUI(muted ? "off" : "on");
+    // Browser memblokir suara otomatis sebelum ada interaksi; kita coba sekarang, dan ulangi di sentuhan pertama.
+    startAudio();
+    const unlock = () => { startAudio(); };
+    ["pointerdown", "touchstart", "mousedown", "keydown", "click"].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
+    loader.__unlock = unlock;
+  }
+  if (soundBtn) soundBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (muted) { muted = false; try { localStorage.setItem("rky_sound", "on"); } catch (x) {} started = false; startAudio(); }
+    else if (!started) { startAudio(); }
+    else { muted = true; try { localStorage.setItem("rky_sound", "off"); } catch (x) {} if (master) master.gain.value = 0; setSoundUI("off"); }
+  });
+  if (skipBtn) skipBtn.addEventListener("click", (e) => { e.stopPropagation(); finish(); });
+
+  // ---------- ANIMASI PROGRES ----------
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; } // easeInOutCubic
+  function frame(now) {
     if (hidden) return;
-    if (!animDone || !contentReady) return; // tunggu KEDUA syarat: animasi penuh + konten siap
+    const el = now - t0;
+    const k = Math.min(1, el / FILL_END);
+    const pct = Math.round(ease(k) * 100);
+    if (pct !== lastPct) {
+      lastPct = pct;
+      if (pctEl) pctEl.textContent = pct;
+      if (ringEl) ringEl.style.strokeDashoffset = (CIRC * (1 - pct / 100)).toFixed(1);
+      if (barEl) barEl.style.transform = "scaleX(" + (pct / 100) + ")";
+    }
+    const ti = Math.min(tips.length - 1, Math.floor((el / DURATION) * tips.length));
+    if (ti !== tipIdx && textEl && FULL) { tipIdx = ti; textEl.classList.remove("swap"); void textEl.offsetWidth; textEl.textContent = tips[ti]; textEl.classList.add("swap"); }
+    if (k >= 1 && !loader.classList.contains("pl-done")) loader.classList.add("pl-done");
+    if (el >= DURATION) { finish(); return; }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+
+  function finish() {
+    if (hidden) return;
     hidden = true;
-    if (tipTimer) clearInterval(tipTimer);
-    const loader = document.getElementById("pageLoader");
-    if (!loader) return;
-    loader.classList.add("loader-hide");
-    setTimeout(() => loader.remove(), 550);
-    sessionStorage.setItem("rky_loader_seen", "1");
+    cancelAnimationFrame(raf);
+    if (pctEl) pctEl.textContent = "100";
+    if (ringEl) ringEl.style.strokeDashoffset = 0;
+    loader.classList.add("pl-done", "loader-hide");
+    document.documentElement.classList.add("app-ready");
+    if (loader.__unlock) ["pointerdown", "touchstart", "mousedown", "keydown", "click"].forEach(ev => window.removeEventListener(ev, loader.__unlock));
+    setTimeout(stopAudio, 600);
+    try { sessionStorage.setItem("rky_loader_seen", "1"); } catch (e) {}
+    setTimeout(() => loader.remove(), EXIT_MS + 100);
   }
-
-  function markContentReady() {
-    if (contentReady) return;
-    contentReady = true;
-    maybeHide();
-  }
-
-  window.addEventListener("load", markContentReady);
-  setTimeout(markContentReady, FALLBACK_MS);
 })();
 // =====================================================================
 // ===== KOIN SAYA — daily check-in streak + golden egg (gamifikasi)

@@ -6,7 +6,7 @@
 <title>@benyoriki Store — Belanja Mudah, Harga Terbaik</title>
 <meta name="title" content="@benyoriki Store - Toko Online Modern & Terpercaya">
 <meta name="description" content="Belanja mudah, cepat, dan aman di @benyoriki Store. Temukan berbagai produk pilihan dengan harga menarik.">
-<meta name="theme-color" content="#141221">
+<meta name="theme-color" content="#0E0B16">
 
 <!-- Open Graph / WhatsApp / Facebook -->
 <meta property="og:type" content="website">
@@ -29,33 +29,47 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="modern.css">
 <link rel="icon" href="favicon.png">
+<script>var IMG_FALLBACK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="#ECE8F2"/><g fill="none" stroke="#A79DB8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><rect x="150" y="105" width="100" height="80" rx="12"/><circle cx="178" cy="132" r="8"/><path d="M158 178l30-26 22 18 14-12 18 20"/></g></svg>');</script>
 </head>
 <body>
 
-<!-- ===== PAGE LOADER ===== -->
-<div id="pageLoader" class="page-loader">
-  <div class="loader-content">
-    <div class="loader-cart">
-      <div class="loader-progress-ring" id="loaderProgressRing" style="--pct:1"></div>
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21 8H6" stroke="url(#lc-grad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="9" cy="21" r="1.4" fill="#FF4D2E"/>
-        <circle cx="18" cy="21" r="1.4" fill="#FF4D2E"/>
-        <defs>
-          <linearGradient id="lc-grad" x1="2" y1="3" x2="21" y2="16" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#FF4D2E"/>
-            <stop offset="1" stop-color="#F5B400"/>
-          </linearGradient>
-        </defs>
-      </svg>
+<!-- ===== PAGE LOADER 2026 (4 detik + suara) ===== -->
+<div id="pageLoader" class="page-loader" role="status" aria-live="polite" aria-label="Memuat toko">
+  <div class="pl-half pl-top"></div>
+  <div class="pl-half pl-bottom"></div>
+  <div class="pl-stage">
+    <div class="pl-glow"></div>
+    <div class="pl-grid"></div>
+    <div class="pl-center">
+      <div class="pl-mark">
+        <span class="pl-chip pl-c1"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span>
+        <span class="pl-chip pl-c2"><svg viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z"/><path d="M9 8a3 3 0 016 0"/></svg></span>
+        <span class="pl-chip pl-c3"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0116 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></span>
+        <span class="pl-chip pl-c4"><svg viewBox="0 0 24 24"><path d="M3 12l9-9h8v8l-9 9-8-8z"/><circle cx="15.5" cy="8.5" r="1.3"/></svg></span>
+        <svg class="pl-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><linearGradient id="plg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF7A3D"/><stop offset=".55" stop-color="#FF4D2E"/><stop offset="1" stop-color="#7C5CFC"/></linearGradient></defs>
+          <circle class="pl-ring-track" cx="60" cy="60" r="54"/>
+          <circle class="pl-ring-fill" id="loaderRing" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="pl-logo"><img src="favicon.png" alt="" width="64" height="64" /></div>
+        <svg class="pl-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </div>
+      <div class="pl-brand"><span class="pl-b1">@benyoriki</span><span class="pl-b2">Store</span></div>
+      <div class="pl-tag" id="loaderText">Menyiapkan etalase terbaik untukmu…</div>
+      <div class="pl-meter"><div class="pl-meter-fill" id="loaderBar"></div></div>
+      <div class="pl-pct"><span id="loaderPercent">0</span><i>%</i></div>
     </div>
-    <div class="loader-brand">@benyoriki<span>Store</span></div>
-    <div class="loader-percent" id="loaderPercent">1%</div>
-    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
-    <div class="loader-text" id="loaderText">Menyiapkan pengalaman belanja terbaikmu...</div>
+    <div class="pl-foot">
+      <button type="button" class="pl-sound" id="loaderSound" aria-pressed="true">
+        <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="pl-wave" d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12"/></svg>
+        <span id="loaderSoundLabel">Suara aktif</span>
+      </button>
+      <button type="button" class="pl-skip" id="loaderSkip">Lewati ›</button>
+    </div>
   </div>
 </div>
 
@@ -231,23 +245,33 @@
 <!-- ADMIN LOGIN MODAL -->
 <div id="loginModal" class="modal-overlay" onclick="closeLoginModal(event)">
   <div class="modal-box login-box">
-    <button onclick="closeLoginModal()" class="modal-close">✕</button>
+    <button onclick="closeLoginModal()" class="modal-close" aria-label="Tutup">✕</button>
     <div class="login-header">
-      <div class="login-icon">🔐</div>
-      <h2>Admin Login</h2>
-      <p>Masukkan kredensial untuk mengakses panel admin</p>
+      <div class="login-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z"/><rect x="9" y="10.5" width="6" height="5" rx="1"/><path d="M10.5 10.5V9a1.5 1.5 0 013 0v1.5"/></svg></div>
+      <h2>Masuk Dasbor Admin</h2>
+      <p>Kelola produk, pesanan, resi, dan notifikasi toko.</p>
     </div>
+    <button type="button" class="btn-demo-admin" onclick="demoAdminLogin()">
+      <span class="bda-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+      <span class="bda-tx"><b>Masuk Akun Demo Admin</b><small>1 ketukan — tanpa mengetik</small></span>
+      <span class="bda-ar">→</span>
+    </button>
+    <div class="login-or"><span>atau masuk manual</span></div>
     <div class="login-form">
       <div class="input-group">
-        <label>Username</label>
-        <input type="text" id="loginUser" placeholder="admin" />
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" placeholder="admin" autocomplete="username" autocapitalize="none" />
       </div>
       <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="••••••••" />
+        <label for="loginPass">Password</label>
+        <div class="pass-wrap">
+          <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="pass-toggle" onclick="togglePassVisibility(this)">Lihat</button>
+        </div>
       </div>
       <button onclick="doLogin()" class="btn-login">Masuk</button>
     </div>
+    <p class="login-demo-hint">Akun demo: <code>admin</code> / <code>6969</code></p>
   </div>
 </div>
 
@@ -461,8 +485,9 @@
       <button class="icon-btn wishlist-btn" onclick="showPage('wishlist')">
         <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg></span> <span id="wishBadge" class="badge">0</span>
       </button>
-      <button id="adminToggle" class="btn-admin admin-hidden-btn" onclick="handleAdminClick()">
-        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Admin
+      <button id="adminToggle" class="btn-admin" onclick="handleAdminClick()" title="Login Admin / Panel Admin">
+        <span class="hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <span id="adminBtnLabel" class="btn-admin-label">Login Admin</span>
         <span id="adminNotifBadge" class="admin-notif-badge" style="display:none">0</span>
       </button>
       <button id="hamburgerBtn" class="hamburger-btn" onclick="openMobileDrawer()" title="Menu">
@@ -527,6 +552,11 @@
       <span class="drawer-item-text">Akun Saya</span>
       <span class="drawer-item-arrow">›</span>
     </button>
+    <button class="drawer-item drawer-item-admin" onclick="closeMobileDrawer(); openAdminLogin();">
+      <span class="drawer-item-icon di-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+      <span class="drawer-item-text"><span id="drawerAdminLabel">Login Admin</span><span class="drawer-coin-sub">Masuk dasbor pengelola toko</span></span>
+      <span class="drawer-item-arrow">›</span>
+    </button>
     <button class="drawer-item" onclick="toggleDarkMode()">
       <span class="drawer-item-icon di-gold" id="drawerDarkIconWrap"><svg id="drawerDarkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
       <span class="drawer-item-text" id="drawerDarkLabel">Mode Gelap</span>
@@ -574,32 +604,53 @@
     <!-- HERO BANNER -->
     <div class="hero-banner">
       <div class="hero-slides-wrapper" id="heroSlider">
-        <div class="hero-slide active" style="background: linear-gradient(135deg, #FF6A3D 0%, #FF4D2E 45%, #B4142D 100%)">
+        <div class="hero-slide hs-1 active">
           <div class="hero-text">
-            <span class="hero-tag">🔥 Flash Sale Hari Ini</span>
+            <span class="hero-tag"><i class="dot-live"></i> Flash Sale Hari Ini</span>
             <h2>Diskon Hingga<br><strong>70% OFF</strong></h2>
-            <p>Jangan sampai kehabisan, stok terbatas!</p>
-            <button onclick="filterCategory('all', document.querySelector('.cat-btn'))">Belanja Sekarang →</button>
+            <p>Gadget, fashion &amp; kebutuhan harian dengan harga terbaik. Stok terbatas!</p>
+            <div class="hero-cta">
+              <button onclick="filterCategory('all', document.querySelector('.cat-btn'))">Belanja Sekarang <span aria-hidden="true">→</span></button>
+              <button class="hero-ghost" onclick="document.getElementById('flashSaleList').scrollIntoView({behavior:'smooth',block:'start'})">Lihat Flash Sale</button>
+            </div>
+            <ul class="hero-perks"><li>Gratis ongkir*</li><li>Retur 30 hari</li><li>Pembayaran aman</li></ul>
           </div>
-          <div class="hero-img"><img src="favicon.png" alt="logo" class="logo1-icon-img" onerror="this.style.display='none'" /></div>
+          <div class="hero-img hv-collage" aria-hidden="true">
+            <figure class="hv-card hv-a"><img src="https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=320&h=400&fit=crop" onerror="this.onerror=null;this.src=IMG_FALLBACK" alt="" width="160" height="200" /><figcaption><b>iPhone 15 Pro Max</b><span>-12%</span></figcaption></figure>
+            <figure class="hv-card hv-b"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=320&h=400&fit=crop" onerror="this.onerror=null;this.src=IMG_FALLBACK" alt="" width="160" height="200" /><figcaption><b>Air Jordan 1</b><span>-20%</span></figcaption></figure>
+            <figure class="hv-card hv-c"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=320&h=400&fit=crop" onerror="this.onerror=null;this.src=IMG_FALLBACK" alt="" width="160" height="200" /><figcaption><b>Smartwatch Pro</b><span>-15%</span></figcaption></figure>
+          </div>
         </div>
-        <div class="hero-slide" style="background: linear-gradient(135deg, #4C1D95 0%, #7C5CFC 55%, #2563EB 100%)">
+        <div class="hero-slide hs-2">
           <div class="hero-text">
-            <span class="hero-tag">✨ Produk Baru</span>
+            <span class="hero-tag">Produk Baru</span>
             <h2>Teknologi<br><strong>Terkini 2026</strong></h2>
-            <p>Gadget terbaru dengan harga kompetitif!</p>
-            <button onclick="filterCategory('elektronik', document.querySelectorAll('.cat-btn')[1])">Lihat Elektronik →</button>
+            <p>Laptop, kamera &amp; gadget terbaru dengan harga kompetitif.</p>
+            <div class="hero-cta">
+              <button onclick="filterCategory('elektronik', document.querySelectorAll('.cat-btn')[1])">Lihat Elektronik <span aria-hidden="true">→</span></button>
+            </div>
           </div>
-          <div class="hero-img">📱</div>
+          <div class="hero-img hv-collage hv-duo" aria-hidden="true">
+            <figure class="hv-card hv-a"><img src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=320&h=400&fit=crop" onerror="this.onerror=null;this.src=IMG_FALLBACK" alt="" width="160" height="200" loading="lazy" /><figcaption><b>ASUS ROG Strix G16</b><span>-13%</span></figcaption></figure>
+            <figure class="hv-card hv-b"><img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=320&h=400&fit=crop" onerror="this.onerror=null;this.src=IMG_FALLBACK" alt="" width="160" height="200" loading="lazy" /><figcaption><b>Sony Alpha</b><span>-8%</span></figcaption></figure>
+          </div>
         </div>
-        <div class="hero-slide" style="background: linear-gradient(135deg, #0B7E70 0%, #0F9E8C 50%, #2FE0C8 100%)">
+        <div class="hero-slide hs-3">
           <div class="hero-text">
-            <span class="hero-tag">📦 Lacak Paket Mudah</span>
+            <span class="hero-tag">Lacak Paket Mudah</span>
             <h2>Pantau Paket<br><strong>Real-Time</strong></h2>
-            <p>Lacak perjalanan paketmu dari dikemas hingga tiba!</p>
-            <button onclick="openTrackingModal()">Lacak Sekarang →</button>
+            <p>Lacak perjalanan paketmu dari dikemas hingga tiba di depan pintu.</p>
+            <div class="hero-cta">
+              <button onclick="openTrackingModal()">Lacak Sekarang <span aria-hidden="true">→</span></button>
+            </div>
           </div>
-          <div class="hero-img">🎁</div>
+          <div class="hero-img hv-track" aria-hidden="true">
+            <div class="ht-card">
+              <div class="ht-top"><span class="ht-box"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><div><b>Pesanan #BNY-2026</b><small>Estimasi tiba besok</small></div></div>
+              <div class="ht-steps"><span class="done">Dikemas</span><span class="done">Dikirim</span><span class="now">Dalam perjalanan</span><span>Tiba</span></div>
+              <div class="ht-bar"><i></i></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="hero-dots" id="heroDots">
@@ -611,10 +662,10 @@
 
     <!-- STATS BAR -->
     <div class="stats-bar">
-      <div class="stat-item"><span class="stat-icon">📦</span><div><strong id="statProducts">0</strong><small>Produk</small></div></div>
-      <div class="stat-item"><span class="stat-icon">⭐</span><div><strong><span data-count-to="4.9" data-count-decimals="1">0</span></strong><small>Rating</small></div></div>
-      <div class="stat-item"><span class="stat-icon">🚚</span><div><strong><span data-count-to="6" data-count-decimals="0">0</span></strong><small>Kurir Tersedia</small></div></div>
-      <div class="stat-item"><span class="stat-icon">🔄</span><div><strong><span data-count-to="30" data-count-decimals="0">0</span></strong><small>Hari Return</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><div><strong id="statProducts">0</strong><small>Produk</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/></svg></span><div><strong><span data-count-to="4.9" data-count-decimals="1">0</span></strong><small>Rating</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="11" rx="1.5"/><path d="M16 10h3.5l3.5 3.5V18h-7z"/><circle cx="6" cy="19.5" r="1.6"/><circle cx="18" cy="19.5" r="1.6"/></svg></span><div><strong><span data-count-to="6" data-count-decimals="0">0</span></strong><small>Kurir Tersedia</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></span><div><strong><span data-count-to="30" data-count-decimals="0">0</span></strong><small>Hari Return</small></div></div>
     </div>
 
     <!-- AI PROMO BANNER -->
