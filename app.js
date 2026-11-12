@@ -248,12 +248,10 @@ function renderCard(p, idx, opts = {}) {
           ${p.origPrice ? `<span class="price-original">${formatRp(p.origPrice)}</span>` : ""}
         </div>
         <div class="card-meta">
-          <span class="card-rating">${renderStars(p.rating)} ${p.rating}</span>
-          <span class="card-sold"><span class="mini-avatars"><i></i><i></i><i></i></span>${(p.sold || 0).toLocaleString("id-ID")} terjual</span>
+          <span class="card-rating"><b class="rt-star">★</b> ${p.rating}</span>
+          <span class="card-sold">${(p.sold || 0).toLocaleString("id-ID")} terjual</span>
         </div>
-        <div class="card-stock ${isLowStock ? "low" : ""}">
-          ${p.stock <= 0 ? "❌ Stok habis" : isLowStock ? `⚠️ Sisa ${p.stock} lagi!` : `📦 Stok: ${p.stock}`}
-        </div>
+        ${p.stock <= 0 ? `<div class="card-stock">Stok habis</div>` : isLowStock ? `<div class="card-stock low">Sisa ${p.stock} lagi!</div>` : `<div class="card-stock ship">Gratis ongkir*</div>`}
         ${p.flash && p.stock > 0 ? `<div class="stock-bar"><div class="stock-fill" style="width: ${100 - stockPct}%"></div></div>` : ""}
         <button class="btn-add-cart" onclick="addToCart(event, ${p.id})" ${p.stock <= 0 ? "disabled" : ""}>${p.stock <= 0 ? "Stok Habis" : "🛒 Beli"}</button>
       </div>
@@ -384,6 +382,13 @@ function filterCategory(cat, btn) {
   showPage("shop");
   updateCategoryBanner();
   renderShop();
+}
+
+function qCat(cat, i) {
+  const btns = document.querySelectorAll(".cat-btn");
+  filterCategory(cat, btns[i]);
+  const t = document.getElementById("filterChipBar");
+  if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function sortProducts(val, el) {

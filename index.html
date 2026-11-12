@@ -32,6 +32,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="modern.css">
+<link rel="stylesheet" href="modern26.css">
 <link rel="icon" href="favicon.png">
 <script>var IMG_FALLBACK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="#ECE8F2"/><g fill="none" stroke="#A79DB8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><rect x="150" y="105" width="100" height="80" rx="12"/><circle cx="178" cy="132" r="8"/><path d="M158 178l30-26 22 18 14-12 18 20"/></g></svg>');</script>
 </head>
@@ -660,14 +661,27 @@
       </div>
     </div>
 
-    <!-- STATS BAR -->
-    <div class="stats-bar">
-      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><div><strong id="statProducts">0</strong><small>Produk</small></div></div>
-      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/></svg></span><div><strong><span data-count-to="4.9" data-count-decimals="1">0</span></strong><small>Rating</small></div></div>
-      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="11" rx="1.5"/><path d="M16 10h3.5l3.5 3.5V18h-7z"/><circle cx="6" cy="19.5" r="1.6"/><circle cx="18" cy="19.5" r="1.6"/></svg></span><div><strong><span data-count-to="6" data-count-decimals="0">0</span></strong><small>Kurir Tersedia</small></div></div>
-      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></span><div><strong><span data-count-to="30" data-count-decimals="0">0</span></strong><small>Hari Return</small></div></div>
+    <!-- BENEFIT STRIP -->
+    <div class="stats-bar benefit-strip">
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><div><strong><span id="statProducts">0</span>+ Produk</strong><small>Pilihan lengkap</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/></svg></span><div><strong>Rating 4.9</strong><small>Dipercaya pembeli</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="11" rx="1.5"/><path d="M16 10h3.5l3.5 3.5V18h-7"/><circle cx="6" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg></span><div><strong>6 Kurir</strong><small>Gratis ongkir*</small></div></div>
+      <div class="stat-item"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></span><div><strong>Retur 30 Hari</strong><small>Belanja tanpa ragu</small></div></div>
     </div>
 
+    <!-- KATEGORI CEPAT -->
+    <section class="cat-tiles" aria-label="Kategori">
+      <button onclick="qCat('elektronik',1)"><i>📱</i><span>Elektronik</span></button>
+      <button onclick="qCat('fashion',2)"><i>👟</i><span>Fashion</span></button>
+      <button onclick="qCat('makanan',3)"><i>🍜</i><span>Makanan</span></button>
+      <button onclick="qCat('kecantikan',4)"><i>💄</i><span>Kecantikan</span></button>
+      <button onclick="qCat('olahraga',5)"><i>⚽</i><span>Olahraga</span></button>
+      <button onclick="qCat('rumah',6)"><i>🏠</i><span>Rumah</span></button>
+      <button onclick="qCat('hewan',7)"><i>🐾</i><span>Hewan</span></button>
+      <button onclick="qCat('otomotif',8)"><i>🏍️</i><span>Otomotif</span></button>
+    </section>
+
+    <div class="promo-duo">
     <!-- AI PROMO BANNER -->
     <div class="ai-promo-banner" onclick="toggleChatbot()">
       <div class="ai-promo-left">
@@ -680,22 +694,6 @@
       <button class="ai-promo-btn">Chat Sekarang →</button>
     </div>
 
-    <!-- TRUST / SOCIAL PROOF BAND -->
-    <div class="trust-band">
-      <div class="trust-band-stack">
-        <div class="trust-avatars"><span>A</span><span>R</span><span>D</span><span>+</span></div>
-        <div class="trust-band-text">
-          <strong>Dipercaya 10.000+ pembeli</strong>
-          <small>Rating rata-rata 4.9/5 dari ribuan ulasan asli</small>
-        </div>
-      </div>
-      <div class="trust-band-stats">
-        <div class="trust-stat"><strong data-count-to="10" data-count-decimals="0">0</strong><small>Ribu+ Pembeli</small></div>
-        <div class="trust-stat"><strong data-count-to="4.9" data-count-decimals="1">0</strong><small>Rating Toko</small></div>
-        <div class="trust-stat"><strong data-count-to="98" data-count-decimals="0">0</strong><small>% Puas</small></div>
-      </div>
-    </div>
-
     <!-- COIN PROMO BANNER -->
     <div class="coin-promo-banner" onclick="showPage('coin')">
       <div class="coin-promo-left">
@@ -706,6 +704,8 @@
         </div>
       </div>
       <span class="coin-promo-cta">Klaim →</span>
+    </div>
+
     </div>
 
     <!-- RECENTLY VIEWED -->
@@ -770,6 +770,23 @@
       <p>Coba kata kunci lain atau lihat semua produk</p>
       <button onclick="toggleChatbot()" class="btn-ask-ai">🤖 Tanya AI untuk rekomendasi</button>
     </div>
+
+    <!-- TRUST / SOCIAL PROOF BAND -->
+    <div class="trust-band">
+      <div class="trust-band-stack">
+        <div class="trust-avatars"><span>A</span><span>R</span><span>D</span><span>+</span></div>
+        <div class="trust-band-text">
+          <strong>Dipercaya 10.000+ pembeli</strong>
+          <small>Rating rata-rata 4.9/5 dari ribuan ulasan asli</small>
+        </div>
+      </div>
+      <div class="trust-band-stats">
+        <div class="trust-stat"><strong data-count-to="10" data-count-decimals="0">0</strong><small>Ribu+ Pembeli</small></div>
+        <div class="trust-stat"><strong data-count-to="4.9" data-count-decimals="1">0</strong><small>Rating Toko</small></div>
+        <div class="trust-stat"><strong data-count-to="98" data-count-decimals="0">0</strong><small>% Puas</small></div>
+      </div>
+    </div>
+
   </section>
 
   <!-- WISHLIST PAGE -->

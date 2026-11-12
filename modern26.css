@@ -1,0 +1,285 @@
+/* =====================================================================
+   @benyoriki Store — DESIGN 2026 v2 (lapisan terakhir)
+   Prinsip: ringan untuk Windows 7 / Chrome 109 — TANPA backdrop-filter,
+   TANPA :has(), color-mix(), nesting CSS. Animasi hanya transform/opacity.
+   Fokus: produk cepat terlihat, harga & diskon menonjol, tombol beli jelas.
+   ===================================================================== */
+
+:root {
+  --bg: #F7F4EF;
+  --ink: #14101C;
+  --coral: #FF4A2B;
+  --coral-2: #FF7A3D;
+  --violet: #6D4AFF;
+  --mint: #19C3A6;
+  --gold: #FFC531;
+  --cta: linear-gradient(135deg, #FF7A3D 0%, #FF4A2B 60%, #E8321B 100%);
+  --ring: 0 0 0 1px rgba(20,16,28,.06);
+  --shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 1px 2px rgba(20,16,28,.05), 0 12px 28px -14px rgba(20,16,28,.18);
+  --font-display: 'Space Grotesk', 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+}
+body.dark {
+  --bg: #0C0A12;
+  --ring: 0 0 0 1px rgba(255,255,255,.07);
+  --shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 14px 30px -16px rgba(0,0,0,.7);
+}
+body { background: var(--bg); background-image: none; }
+
+/* lebar konten PC dibatasi agar rapi di monitor besar */
+#mainContent { max-width: 1440px; margin-left: auto; margin-right: auto; }
+
+/* render bagian di bawah layar belakangan -> scroll & muat lebih ringan */
+#productList, .trust-band, footer { content-visibility: auto; contain-intrinsic-size: 1px 900px; }
+
+/* ---------- Header: bersih, tinggi tidak boros ---------- */
+#mainHeader.header-shrink { box-shadow: 0 8px 22px -14px rgba(20,16,28,.35); }
+.logo-text { font-family: var(--font-display); font-weight: 700; letter-spacing: -.04em; }
+.logo-text span { color: var(--coral); }
+.search-bar { background: #EFEBE5; border-radius: 14px; }
+body.dark .search-bar { background: #1A1626; }
+.btn-admin { border-radius: 14px; }
+.cat-btn { border-radius: 12px; font-weight: 600; }
+.cat-btn.active { background: var(--ink); color: #fff; }
+body.dark .cat-btn.active { background: var(--cta); }
+
+/* ---------- Hero: tipografi besar + pola titik ---------- */
+.hero-banner { border-radius: 30px; box-shadow: 0 34px 60px -34px rgba(60,20,40,.7); }
+.hero-slide { border-radius: 30px; position: relative; }
+.hero-slide::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background-image: radial-gradient(rgba(255,255,255,.22) 1.2px, transparent 1.4px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 35%, #000 100%); mask-image: linear-gradient(100deg, transparent 35%, #000 100%);
+}
+.hs-1 { background:
+  radial-gradient(480px 320px at 85% 10%, rgba(255,197,49,.65), transparent 62%),
+  radial-gradient(520px 420px at 0% 110%, rgba(109,74,255,.7), transparent 60%),
+  linear-gradient(135deg, #FF6034 0%, #E8321B 48%, #7A1240 100%); }
+.hs-2 { background:
+  radial-gradient(480px 320px at 90% 5%, rgba(25,195,166,.5), transparent 62%),
+  radial-gradient(420px 320px at 0% 100%, rgba(255,74,43,.45), transparent 60%),
+  linear-gradient(135deg, #1D1252 0%, #4A32D0 58%, #2563EB 100%); }
+.hero-text, .hv-collage, .hv-track { position: relative; z-index: 2; }
+.hero-text h2 { font-family: var(--font-display); }
+.hero-text h2 strong {
+  font-family: var(--font-display); font-weight: 700;
+  background: linear-gradient(180deg, #FFFFFF 30%, #FFE3A3 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.hero-text button:not(.hero-ghost) { background: #fff; color: var(--ink); border-radius: 16px; }
+.hero-text button:not(.hero-ghost):hover { transform: translateY(-2px); }
+.hv-card { border-radius: 24px; }
+.hv-card span { background: var(--coral); }
+
+/* ---------- Benefit strip (menggantikan 4 kartu statistik) ---------- */
+.benefit-strip { gap: 10px; margin: 0 0 16px; }
+.benefit-strip .stat-item { box-shadow: var(--ring); background: var(--card-bg); border-radius: 16px; }
+.benefit-strip .stat-icon { background: rgba(255,74,43,.1); color: var(--coral); }
+.benefit-strip .stat-item:nth-child(2) .stat-icon { background: rgba(255,197,49,.2); color: #C58A00; }
+.benefit-strip .stat-item:nth-child(3) .stat-icon { background: rgba(25,195,166,.14); color: #0A9C84; }
+.benefit-strip .stat-item:nth-child(4) .stat-icon { background: rgba(109,74,255,.12); color: var(--violet); }
+.benefit-strip strong { font-size: .95rem; white-space: nowrap; }
+.benefit-strip small { font-size: .72rem; white-space: nowrap; }
+
+/* ---------- Kategori cepat (ala aplikasi belanja) ---------- */
+.cat-tiles { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin: 0 0 18px; }
+.cat-tiles button {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px 10px; cursor: pointer;
+  background: var(--card-bg); border: 0; border-radius: 18px; box-shadow: var(--ring);
+  font-family: var(--font); font-size: .76rem; font-weight: 700; color: var(--text);
+  transition: transform .15s ease-out, box-shadow .15s ease-out;
+}
+.cat-tiles button i {
+  font-style: normal; width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  background: linear-gradient(145deg, #FFF1EA, #FFE0D3);
+}
+.cat-tiles button:nth-child(3n+2) i { background: linear-gradient(145deg, #EFEAFF, #E0D8FF); }
+.cat-tiles button:nth-child(3n) i { background: linear-gradient(145deg, #E3FAF5, #CDF3EA); }
+body.dark .cat-tiles button i { background: rgba(255,255,255,.07) !important; }
+.cat-tiles button:hover { transform: translateY(-3px); box-shadow: 0 14px 24px -14px rgba(255,74,43,.5); }
+.cat-tiles button:active { transform: scale(.96); }
+
+/* ---------- Promo ganda: AI + Koin berdampingan ---------- */
+.promo-duo { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; margin-bottom: 8px; }
+.promo-duo .ai-promo-banner, .promo-duo .coin-promo-banner { margin: 0; height: 100%; }
+.promo-duo .ai-promo-banner { flex-wrap: nowrap; }
+.promo-duo .coin-promo-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-radius: 24px; border: 0; }
+
+/* ---------- Judul seksi ---------- */
+.section-title h3 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.035em; font-size: 1.6rem; }
+#flashSaleList { position: relative; }
+.countdown-seg { background: var(--coral); color: #fff; }
+body.dark .countdown-seg { background: var(--coral); }
+
+/* ---------- Kartu produk: harga dan tombol jadi bintang ---------- */
+.product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+.product-card { border-radius: 24px; border: 0; box-shadow: var(--shadow); background: var(--card-bg); }
+.product-card:hover { box-shadow: 0 22px 38px -18px rgba(255,74,43,.45), 0 2px 6px rgba(20,16,28,.06); }
+.card-img-wrap { aspect-ratio: 1 / 1; border-radius: 0; }
+.card-img-wrap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34%; pointer-events: none; background: linear-gradient(to top, rgba(20,16,28,.16), transparent); }
+.card-carousel-dots { z-index: 2; }
+.card-badges { gap: 5px; }
+.card-badges .badge-discount { background: var(--coral); color: #fff; font-weight: 800; box-shadow: none; }
+.card-badges .badge-flash { background: var(--ink); color: var(--gold); }
+.card-badges .badge-ai { background: rgba(255,255,255,.94); color: var(--violet); box-shadow: none; }
+.card-body { padding: 14px 15px 15px; }
+.card-category { font-size: .62rem; font-weight: 800; letter-spacing: .12em; color: var(--coral); text-transform: uppercase; margin-bottom: 5px; }
+.card-body h4 { font-size: .95rem; font-weight: 700; min-height: 2.6em; }
+.card-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-bottom: 8px; }
+.price-current { font-family: var(--font-display); font-size: 1.28rem; font-weight: 700; letter-spacing: -.03em; color: var(--text); }
+.price-original { font-size: .76rem; color: var(--text-muted); }
+.card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; font-size: .74rem; font-weight: 600; color: var(--text-muted); }
+.card-meta .card-rating { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 8px; background: rgba(255,197,49,.2); color: #9A6B00; font-weight: 800; }
+body.dark .card-meta .card-rating { color: var(--gold); }
+.rt-star { color: #F5A800; font-size: .8rem; }
+.card-stock { font-size: .72rem; font-weight: 700; margin-bottom: 9px; color: var(--text-muted); }
+.card-stock.ship { color: #0A9C84; }
+.card-stock.ship::before { content: "✓ "; }
+.card-stock.low { color: #E11D48; }
+.stock-bar { height: 6px; border-radius: 6px; margin-bottom: 11px; }
+.stock-fill { background: linear-gradient(90deg, var(--gold), var(--coral)); }
+.btn-add-cart { border-radius: 14px; padding: 12px 10px; font-size: .9rem; letter-spacing: .01em; background: var(--cta); }
+.card-wish-btn { box-shadow: 0 4px 12px -4px rgba(0,0,0,.3); }
+
+/* ---------- Filter & trust ---------- */
+.filter-chip.active { background: var(--ink); color: #fff; }
+.trust-band { margin-top: 40px; }
+
+/* ---------- Footer ---------- */
+footer { background: #0F0B17; }
+
+/* =====================================================================
+   PC besar
+   ===================================================================== */
+@media (min-width: 1200px) {
+  #flashSaleList.product-grid { grid-template-columns: repeat(6, 1fr); }
+  .hero-slide { min-height: 420px; padding: 52px 72px; }
+  .hero-text h2 strong { font-size: clamp(3.4rem, 6.4vw, 5.6rem); }
+  .hv-collage { height: 360px; transform: scale(1.08); transform-origin: center right; }
+}
+@media (min-width: 1440px) {
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(214px, 1fr)); }
+}
+
+/* =====================================================================
+   Tablet
+   ===================================================================== */
+@media (max-width: 960px) {
+  .cat-tiles { grid-template-columns: repeat(4, 1fr); }
+  .promo-duo { grid-template-columns: 1fr; }
+  .benefit-strip { display: flex; overflow-x: auto; scrollbar-width: none; }
+  .benefit-strip::-webkit-scrollbar { display: none; }
+  .benefit-strip .stat-item { flex: 0 0 auto; }
+}
+
+/* =====================================================================
+   HP
+   ===================================================================== */
+@media (max-width: 768px) {
+  body { padding-bottom: 76px; }
+  .hero-slide { padding: 20px 18px 38px; gap: 10px; }
+  .hv-collage { height: 138px; }
+  .hv-card { width: 96px; }
+  .hv-b { width: 106px; left: 100px; }
+  .hv-c { left: 206px; }
+  .hv-duo .hv-a { width: 112px; }
+  .hv-duo .hv-b { width: 108px; left: 160px; }
+  .hero-text p { margin-bottom: 12px; }
+  .hero-text h2 { font-size: 1.7rem; }
+  .hero-text h2 strong { font-size: 3.5rem; }
+  .benefit-strip { margin: 0 -14px 14px; padding: 0 14px; gap: 8px; }
+  .benefit-strip .stat-item { padding: 10px 14px 10px 10px; }
+  .benefit-strip .stat-icon { width: 34px; height: 34px; border-radius: 11px; }
+  .benefit-strip .stat-icon svg { width: 18px; height: 18px; }
+
+  /* kategori cepat: geser horizontal, ikon besar */
+  .cat-tiles { display: flex; overflow-x: auto; gap: 8px; margin: 0 -14px 14px; padding: 2px 14px 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .cat-tiles::-webkit-scrollbar { display: none; }
+  .cat-tiles button { flex: 0 0 74px; padding: 10px 2px 9px; border-radius: 16px; font-size: .7rem; }
+  .cat-tiles button i { width: 44px; height: 44px; font-size: 1.35rem; border-radius: 14px; }
+
+  .promo-duo { gap: 10px; }
+  .promo-duo .coin-promo-banner { padding: 14px 16px; border-radius: 20px; }
+  .section-title h3 { font-size: 1.25rem; }
+
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .product-card { border-radius: 20px; }
+  .card-body { padding: 11px 11px 12px; }
+  .card-body h4 { font-size: .84rem; }
+  .price-current { font-size: 1.04rem; }
+  .card-meta { gap: 6px; font-size: .68rem; }
+  .btn-add-cart { padding: 11px 8px; font-size: .84rem; border-radius: 13px; }
+  #flashSaleList .product-card { flex-basis: 164px; }
+
+  /* tombol melayang tidak menutupi produk */
+  .chatbot-fab { bottom: 92px; right: 14px; width: 50px; height: 50px; }
+  .back-to-top { bottom: 152px; right: 16px; width: 42px; height: 42px; }
+}
+@media (max-width: 380px) {
+  .hero-text h2 strong { font-size: 3rem; }
+  .cat-tiles button { flex-basis: 68px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-tiles button, .product-card { transition: none; }
+}
+
+/* =====================================================================
+   v2.1 — Perbaikan HP: header admin, panel admin, modal jadi "bottom sheet",
+   form lebih rapat. (Ringan: hanya transform/opacity.)
+   ===================================================================== */
+
+/* pesan error form tidak memakan ruang saat kosong */
+.input-error-msg { min-height: 0; margin-top: 3px; }
+.input-error-msg:empty { display: none; }
+
+/* font input 16px: tidak ada auto-zoom di iPhone/Android */
+@media (max-width: 768px) {
+  input, textarea, select { font-size: 16px; }
+}
+
+@media (max-width: 768px) {
+  /* --- Header: selalu 1 baris logo + aksi, tombol admin hanya ikon --- */
+  .header-inner { flex-wrap: wrap; }
+  .logo { min-width: 0; flex: 0 1 auto; }
+  .logo-text { font-size: 1.08rem; white-space: nowrap; }
+  .header-actions { margin-left: auto; flex: 0 0 auto; flex-wrap: nowrap; }
+  .btn-admin .btn-admin-label, .btn-admin.is-admin .btn-admin-label { display: none !important; }
+  .btn-admin { width: 42px; height: 42px; padding: 0; justify-content: center; border-radius: 14px; }
+  .search-bar-wrap { order: 5; flex: 1 1 100%; }
+
+  /* --- Panel admin: sidebar jadi bar horizontal yang rapi --- */
+  .admin-layout { flex-direction: column; gap: 12px; min-height: 0; background: transparent; }
+  .admin-sidebar { width: 100%; flex-direction: column; flex-wrap: nowrap; gap: 10px; padding: 14px; border-radius: 24px; background: linear-gradient(135deg, #17122B, #241A4A); }
+  .admin-profile { flex-direction: row; justify-content: flex-start; text-align: left; gap: 10px; padding: 10px 12px; margin: 0; border-radius: 16px; }
+  .admin-avatar { font-size: 1.5rem; margin: 0; }
+  .admin-profile strong { font-size: .92rem; }
+  .admin-profile small { margin-left: auto; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.1); }
+  .admin-nav { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .admin-nav::-webkit-scrollbar { display: none; }
+  .admin-nav-btn { flex: 0 0 auto; white-space: nowrap; font-size: .8rem; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,.06); }
+  .btn-logout { margin-top: 0; text-align: center; padding: 10px 14px; border-radius: 12px; font-size: .84rem; }
+  .admin-main { padding: 18px 14px; border-radius: 24px; }
+  .dashboard-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+  /* --- Semua modal: bottom sheet --- */
+  .modal-overlay, .checkout-modal-overlay, .tracking-modal-overlay, .myorders-modal-overlay { align-items: flex-end; padding: 0; }
+  .modal-box, .checkout-modal-box, .tracking-modal-box, .myorders-modal-box {
+    max-width: none; width: 100%; max-height: 92vh; max-height: 92dvh;
+    border-radius: 28px 28px 0 0 !important;
+    animation: sheetUp .28s cubic-bezier(.16,1,.3,1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .modal-box::before, .checkout-modal-box::before {
+    content: ""; display: block; width: 42px; height: 4px; margin: 10px auto 0; border-radius: 4px; background: var(--border);
+  }
+  .modal-box.auth-box, .modal-box.login-box, .modal-box.profile-box { padding: 14px 18px 22px; }
+  .modal-close { top: 10px; right: 12px; }
+
+  /* --- Form lebih rapat --- */
+  .co-form-grid { gap: 10px; }
+  .checkout-modal-header { padding: 12px 18px 12px; }
+  .co-input-group input, .co-input-group textarea { padding: 12px 14px; border-radius: 14px; }
+  .auth-box .input-group, .profile-box .input-group { margin-bottom: 10px; }
+  .auth-box h2 { font-size: 1.3rem; }
+}
+@keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
